@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { parseRepositoryUrl } from "@/lib/github/url-parser";
 import { GitHubApiError, GitHubClient } from "@/lib/github/client";
+import { getFallbackRepoPayload } from "@/lib/github/fallback-data";
 
 const analyzeRequestSchema = z.object({
   repo: z.string().min(1).max(300),
@@ -9,6 +10,9 @@ const analyzeRequestSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  let parsedOwner = "";
+  let parsedRepo = "";
+
   try {
     const body = await req.json();
     const validation = analyzeRequestSchema.safeParse(body);
@@ -32,6 +36,8 @@ export async function POST(req: NextRequest) {
     }
 
     const { owner, repo } = parseResult.data;
+    parsedOwner = owner;
+    parsedRepo = repo;
     const client = new GitHubClient();
 
     const analysis = await client.analyzeRepository(owner, repo, {
@@ -41,6 +47,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(analysis, { status: 200 });
   } catch (error: unknown) {
     if (error instanceof GitHubApiError) {
+      if (error.isRateLimit && parsedOwner && parsedRepo) {
+        // Provide immediate functional fallback so maintainers can test the UI without blocking
+        const fallback = getFallbackRepoPayload(parsedOwner, parsedRepo);
+        return NextResponse.json(
+          {
+            ...fallback,
+            isDemoFallback: true,
+            warning: error.message,
+            resetAt: error.resetAt,
+          },
+          { status: 200 }
+        );
+      }
+
       return NextResponse.json(
         {
           error: error.message,
@@ -61,3 +81,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

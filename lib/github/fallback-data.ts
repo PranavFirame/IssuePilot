@@ -1,0 +1,286 @@
+import { BeginnerIssue } from "./search";
+import { NormalizedIssue, RepositoryAnalysisPayload, RepositorySummary } from "./types";
+import { calculateRepositoryHealth } from "../metrics/health-score";
+
+export function getFallbackBeginnerIssues(language?: string): BeginnerIssue[] {
+  const allIssues: BeginnerIssue[] = [
+    {
+      id: 9001,
+      number: 28412,
+      title: "Docs: Fix broken link in Server Components tutorial",
+      body: "In the getting started guide, the link pointing to the concurrent rendering tutorial returns 404.",
+      state: "open",
+      htmlUrl: "https://github.com/facebook/react/issues/28412",
+      commentsCount: 2,
+      createdAt: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
+      author: { login: "dan_abramov", avatarUrl: "https://github.com/gaearon.png" },
+      repository: {
+        owner: "facebook",
+        name: "react",
+        fullName: "facebook/react",
+        htmlUrl: "https://github.com/facebook/react",
+        avatarUrl: "https://github.com/facebook.png",
+        stars: 231000,
+        language: "JavaScript",
+      },
+      labels: [
+        { id: 1, name: "good first issue", color: "7057ff" },
+        { id: 2, name: "documentation", color: "0075ca" },
+      ],
+      difficulty: "good first issue",
+      ageInDays: 4,
+      freshness: "recent",
+    },
+    {
+      id: 9002,
+      number: 14210,
+      title: "CLI: Add --dry-run option to tailwindcss init command",
+      body: "Feature request for first timers: support previewing generated tailwind.config.js file without writing to disk.",
+      state: "open",
+      htmlUrl: "https://github.com/tailwindlabs/tailwindcss/issues/14210",
+      commentsCount: 1,
+      createdAt: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
+      author: { login: "adamwathan", avatarUrl: "https://github.com/adamwathan.png" },
+      repository: {
+        owner: "tailwindlabs",
+        name: "tailwindcss",
+        fullName: "tailwindlabs/tailwindcss",
+        htmlUrl: "https://github.com/tailwindlabs/tailwindcss",
+        avatarUrl: "https://github.com/tailwindlabs.png",
+        stars: 84000,
+        language: "TypeScript",
+      },
+      labels: [
+        { id: 3, name: "good first issue", color: "7057ff" },
+        { id: 4, name: "help wanted", color: "008672" },
+      ],
+      difficulty: "good first issue",
+      ageInDays: 6,
+      freshness: "recent",
+    },
+    {
+      id: 9003,
+      number: 68120,
+      title: "Types: Improve NextResponse.json return type inference with Zod schema",
+      body: "When returning typed JSON, generic parameter inference could be streamlined for TypeScript strict mode.",
+      state: "open",
+      htmlUrl: "https://github.com/vercel/next.js/issues/68120",
+      commentsCount: 3,
+      createdAt: new Date(Date.now() - 10 * 24 * 3600 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
+      author: { login: "timneutkens", avatarUrl: "https://github.com/timneutkens.png" },
+      repository: {
+        owner: "vercel",
+        name: "next.js",
+        fullName: "vercel/next.js",
+        htmlUrl: "https://github.com/vercel/next.js",
+        avatarUrl: "https://github.com/vercel.png",
+        stars: 129000,
+        language: "TypeScript",
+      },
+      labels: [
+        { id: 5, name: "help wanted", color: "008672" },
+        { id: 6, name: "area: TypeScript", color: "3178c6" },
+      ],
+      difficulty: "help wanted",
+      ageInDays: 10,
+      freshness: "recent",
+    },
+    {
+      id: 9004,
+      number: 4892,
+      title: "Accessibility: Add aria-expanded to AccordionTrigger component",
+      body: "Screen readers should announce the expanded state of accordion items when focused.",
+      state: "open",
+      htmlUrl: "https://github.com/shadcn-ui/ui/issues/4892",
+      commentsCount: 1,
+      createdAt: new Date(Date.now() - 12 * 24 * 3600 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(),
+      author: { login: "shadcn", avatarUrl: "https://github.com/shadcn.png" },
+      repository: {
+        owner: "shadcn-ui",
+        name: "ui",
+        fullName: "shadcn-ui/ui",
+        htmlUrl: "https://github.com/shadcn-ui/ui",
+        avatarUrl: "https://github.com/shadcn-ui.png",
+        stars: 76000,
+        language: "TypeScript",
+      },
+      labels: [
+        { id: 7, name: "good first issue", color: "7057ff" },
+        { id: 8, name: "a11y", color: "e11d48" },
+      ],
+      difficulty: "good first issue",
+      ageInDays: 12,
+      freshness: "recent",
+    },
+    {
+      id: 9005,
+      number: 10850,
+      title: "CLI: Add colored JSON output formatting for debug logs",
+      body: "Standardize terminal ANSI color codes when dumping debug payload dictionaries in Python 3.12.",
+      state: "open",
+      htmlUrl: "https://github.com/psf/requests/issues/10850",
+      commentsCount: 0,
+      createdAt: new Date(Date.now() - 8 * 24 * 3600 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
+      author: { login: "kennethreitz", avatarUrl: "https://github.com/kennethreitz.png" },
+      repository: {
+        owner: "psf",
+        name: "requests",
+        fullName: "psf/requests",
+        htmlUrl: "https://github.com/psf/requests",
+        avatarUrl: "https://github.com/psf.png",
+        stars: 52000,
+        language: "Python",
+      },
+      labels: [
+        { id: 9, name: "beginner", color: "a2eeef" },
+        { id: 10, name: "enhancement", color: "a2eeef" },
+      ],
+      difficulty: "beginner",
+      ageInDays: 8,
+      freshness: "recent",
+    },
+  ];
+
+  if (!language || language.toLowerCase() === "all") return allIssues;
+
+  const filtered = allIssues.filter(
+    (i) => i.repository.language?.toLowerCase() === language.toLowerCase()
+  );
+  return filtered.length > 0 ? filtered : allIssues;
+}
+
+export function getFallbackRepoPayload(owner: string, repo: string): RepositoryAnalysisPayload {
+  const fullName = `${owner}/${repo}`;
+  const now = new Date();
+
+  const mockRepo: RepositorySummary = {
+    owner,
+    repo,
+    fullName,
+    description: `High-performance open-source repository (${fullName}) with active backlog items.`,
+    htmlUrl: `https://github.com/${owner}/${repo}`,
+    stars: 84200,
+    forks: 14200,
+    openIssuesCount: 42,
+    openPrCount: 14,
+    closedPrCount: 1540,
+    language: "TypeScript",
+    license: "MIT",
+    createdAt: new Date(Date.now() - 365 * 3 * 24 * 3600 * 1000).toISOString(),
+    updatedAt: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
+    pushedAt: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
+    defaultBranch: "main",
+    isArchived: false,
+    contributors: [
+      { login: owner, avatarUrl: `https://github.com/${owner}.png`, contributions: 1240 },
+      { login: "core-maintainer", avatarUrl: "https://github.com/ghost.png", contributions: 580 },
+    ],
+  };
+
+  const mockIssues: NormalizedIssue[] = [
+    {
+      id: 101,
+      number: 101,
+      title: "Memory leak in WebSocket client connection when reconnecting",
+      body: "WebSocket connection leaks memory after multiple reconnection attempts under high packet throughput.",
+      state: "open",
+      author: { login: "developer-a", avatarUrl: "https://github.com/ghost.png" },
+      labels: [{ id: 1, name: "bug", color: "d73a4a" }, { id: 2, name: "network", color: "0075ca" }],
+      commentsCount: 3,
+      createdAt: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(),
+      updatedAt: new Date().toISOString(),
+      closedAt: null,
+      htmlUrl: `https://github.com/${owner}/${repo}/issues/101`,
+      isPullRequest: false,
+      ageInDays: 5,
+      isStale: false,
+    },
+    {
+      id: 102,
+      number: 102,
+      title: "WebSocket client memory leak on reconnect",
+      body: "Whenever reconnecting, WebSocket client leaks heap memory over time. Duplicate of potential networking issue.",
+      state: "open",
+      author: { login: "developer-b", avatarUrl: "https://github.com/ghost.png" },
+      labels: [{ id: 1, name: "bug", color: "d73a4a" }],
+      commentsCount: 1,
+      createdAt: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
+      updatedAt: new Date().toISOString(),
+      closedAt: null,
+      htmlUrl: `https://github.com/${owner}/${repo}/issues/102`,
+      isPullRequest: false,
+      ageInDays: 2,
+      isStale: false,
+    },
+    {
+      id: 103,
+      number: 103,
+      title: "Add support for dark theme color scheme in navigation header",
+      body: "First time contributors welcome: add dark theme support to navbar matching system preference.",
+      state: "open",
+      author: { login: "designer", avatarUrl: "https://github.com/ghost.png" },
+      labels: [
+        { id: 3, name: "good first issue", color: "7057ff" },
+        { id: 4, name: "ui", color: "008672" },
+      ],
+      commentsCount: 0,
+      createdAt: new Date(Date.now() - 14 * 24 * 3600 * 1000).toISOString(),
+      updatedAt: new Date().toISOString(),
+      closedAt: null,
+      htmlUrl: `https://github.com/${owner}/${repo}/issues/103`,
+      isPullRequest: false,
+      ageInDays: 14,
+      isStale: false,
+    },
+    {
+      id: 104,
+      number: 104,
+      title: "Outdated installation commands in README quickstart guide",
+      body: "The quickstart instructions reference legacy npm v6 command flags. Needs documentation update.",
+      state: "open",
+      author: { login: "docs-team", avatarUrl: "https://github.com/ghost.png" },
+      labels: [
+        { id: 5, name: "documentation", color: "0075ca" },
+        { id: 3, name: "good first issue", color: "7057ff" },
+      ],
+      commentsCount: 2,
+      createdAt: new Date(Date.now() - 95 * 24 * 3600 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 95 * 24 * 3600 * 1000).toISOString(),
+      closedAt: null,
+      htmlUrl: `https://github.com/${owner}/${repo}/issues/104`,
+      isPullRequest: false,
+      ageInDays: 95,
+      isStale: true,
+    },
+  ];
+
+  const health = calculateRepositoryHealth(mockRepo, mockIssues);
+
+  return {
+    repository: mockRepo,
+    health,
+    issues: mockIssues,
+    labelsDistribution: [
+      { name: "good first issue", color: "7057ff", count: 2 },
+      { name: "bug", color: "d73a4a", count: 2 },
+      { name: "documentation", color: "0075ca", count: 1 },
+      { name: "ui", color: "008672", count: 1 },
+    ],
+    activityTimeline: [
+      { date: "2026-10-18", createdCount: 2, closedCount: 3 },
+      { date: "2026-10-19", createdCount: 1, closedCount: 2 },
+      { date: "2026-10-20", createdCount: 3, closedCount: 1 },
+    ],
+    rateLimit: {
+      limit: 60,
+      remaining: 0,
+      resetAt: new Date(Date.now() + 3600000).toISOString(),
+      isApproachingLimit: true,
+    },
+  };
+}

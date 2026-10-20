@@ -165,6 +165,24 @@ export default function RepositoryDashboardPage() {
         {/* Success / Loaded Dashboard */}
         {!isLoading && data && (
           <div className="space-y-6">
+            {/* Demo Fallback Warning Banner if Rate Limited */}
+            {(data as any).isDemoFallback && (
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-500 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 shrink-0" />
+                  <span>
+                    <strong>Rate Limit Active:</strong> Displaying offline demonstration snapshot. Add a{" "}
+                    <code>GITHUB_TOKEN</code> to your <code>.env</code> file for 5,000 live requests/hour.
+                  </span>
+                </div>
+                {data.rateLimit?.resetAt && (
+                  <span className="font-mono text-[11px] shrink-0 text-muted-foreground">
+                    Resets at {new Date(data.rateLimit.resetAt).toLocaleTimeString()}
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* Header */}
             <RepoHeader data={data} onRefresh={() => loadRepositoryData(true)} />
 
