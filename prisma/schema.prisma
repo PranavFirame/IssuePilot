@@ -44,6 +44,53 @@ model TriageSnapshot {
   @@index([owner, repo, issueNumber])
 }
 
+model TrackedIssue {
+  id            String   @id @default(cuid())
+  userId        String   @default("default-user")
+  issueNumber   Int
+  repoOwner     String
+  repoName      String
+  title         String
+  htmlUrl       String
+  state         String   @default("open") // "open" | "closed"
+  status        String   @default("saved") // "saved" | "interested" | "in_progress" | "completed"
+  notes         String?
+  labels        String   @default("[]") // JSON string array of label names
+  language      String?
+  difficulty    String?  // "good first issue", "help wanted", "documentation"
+  prUrl         String?  // Linked GitHub pull request URL if completed
+  isPrConfirmed Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, repoOwner, repoName, issueNumber])
+  @@index([userId, status])
+}
+
+model UserPreference {
+  id              String   @id @default(cuid())
+  userId          String   @unique @default("default-user")
+  languages       String   @default("[\"TypeScript\",\"JavaScript\",\"Python\"]") // JSON array
+  experienceLevel String   @default("beginner") // "beginner" | "intermediate" | "advanced"
+  topics          String   @default("[\"web\",\"react\",\"tools\"]") // JSON array
+  monthlyGoal     Int      @default(3)
+  updatedAt       DateTime @updatedAt
+}
+
+model RecentlyViewedIssue {
+  id          String   @id @default(cuid())
+  userId      String   @default("default-user")
+  issueNumber Int
+  repoOwner   String
+  repoName    String
+  title       String
+  htmlUrl     String
+  language    String?
+  viewedAt    DateTime @default(now())
+
+  @@index([userId, viewedAt])
+}
+
 model AuditLog {
   id        String   @id @default(cuid())
   action    String

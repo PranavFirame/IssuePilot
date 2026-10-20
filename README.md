@@ -14,32 +14,47 @@ IssuePilot is a production-grade developer platform designed for open-source mai
 
 ## Key Features
 
-1. **Repository Health & Staleness Scoring**:
+1. **Beginner Issue Discovery Hub (`/explore`)**:
+   - Curates open issues tagged `good first issue`, `help wanted`, `beginner`, and `documentation` across active GitHub repositories.
+   - Filter by language (TypeScript, Python, Rust, Go, Java, C++, etc.), difficulty level, and sorting.
+   - Filter state is synchronized with URL search params for shareable and refresh-resilient queries.
+
+2. **Personal Contributor Workspace & Kanban (`/workspace`)**:
+   - Track issues into four lifecycle stages: **Saved**, **Interested**, **In Progress**, and **Completed**.
+   - Attach personal implementation notes to any tracked issue.
+   - Synchronized with Prisma SQLite/PostgreSQL storage and resilient `localStorage` caching for zero-setup unauthenticated browsing.
+
+3. **Transparent Relevance Recommendations**:
+   - Set programming languages, frameworks, topics, and experience level in the Recommendation Preferences profile.
+   - Computes transparent, explainable match percentages (0–100%) with exact breakdown reasons.
+   - Zero false pretenses: Heuristic scores are clearly labeled and never disguised as AI certainty.
+
+4. **Personal Contribution Progress & PR Verification**:
+   - Lightweight contribution counter and customizable monthly target goals.
+   - Attach GitHub Pull Request URLs (`https://github.com/owner/repo/pull/123`) to completed issues.
+   - Visually distinguishes manually marked completions from confirmed pull requests.
+
+5. **Repository Health & Staleness Scoring**:
    - Calculates a multi-factor health grade (**A+ through F**) and numerical score (0–100) based on push velocity, issue closure ratios, stale backlog volume (>90 days inactive), and pull request turnover.
    - Computes average and median backlog age in days.
 
-2. **Duplicate Issue Radar**:
+6. **Duplicate Issue Radar**:
    - Deterministic Term Frequency–Inverse Document Frequency (TF-IDF) and weighted token cosine similarity vectorizer.
    - Boosts titles with 3x weight, pairs potential duplicate issues with similarity percentage scores, highlights shared keywords, and provides direct links to inspect issues on GitHub.
 
-3. **AI-Assisted Issue Triage**:
+7. **AI-Assisted Issue Triage**:
    - Classifies issues into `bug`, `feature`, `documentation`, `question`, `enhancement`, or `performance`.
    - Recommends priority (`critical`, `high`, `medium`, `low`) with transparent reasoning.
    - Identifies missing information (reproduction steps, environment details, logs).
    - Generates suggested labels with one-click copying.
    - **Zero-Crash Degradation**: If no AI key is configured, all repository analysis, duplicate detection, health scoring, and export tools continue working seamlessly.
 
-4. **Interactive Issue Explorer**:
-   - Instant search across issue titles, `#numbers`, and author handles.
-   - Filter by status (`open`, `closed`, `all`), age/staleness (`stale >90d`, `active <90d`), and label chips.
-   - Sort by newest, oldest, and most commented.
-
-5. **Export & Persistence**:
+8. **Export & Persistence**:
    - One-click RFC-4180 compliant CSV issue backlog exports.
    - Comprehensive Markdown intelligence reports formatted for team reviews.
    - Save and manage repository snapshots via Prisma ORM (SQLite for zero-setup local dev/test; PostgreSQL with Docker Compose for production).
 
-6. **Hardened Security**:
+9. **Hardened Security**:
    - **SSRF Defense**: Strict regex validation of owner and repository names (`^[a-zA-Z0-9_.-]+$`), restricting outgoing requests solely to `api.github.com`.
    - **Prompt Injection Defense**: Issue titles and descriptions are wrapped in strict `<untrusted_issue_data>` XML fences with explicit system directives preventing prompt hijacking.
    - **Read-Only**: Zero write operations or destructive actions to GitHub repositories.

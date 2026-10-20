@@ -5,15 +5,33 @@ import {
   FileSpreadsheet,
   Gauge,
   ShieldAlert,
+  Sparkles,
+  BookmarkCheck,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
 
 const FEATURES = [
   {
+    icon: Sparkles,
+    title: "Beginner Issue Discovery",
+    description:
+      "Curates accessible starter tickets tagged 'good first issue', 'help wanted', and 'documentation' across GitHub with explainable language and skill relevance scoring.",
+    badge: "Open Source Radar",
+    color: "text-indigo-400",
+  },
+  {
+    icon: BookmarkCheck,
+    title: "Personal Contributor Workspace",
+    description:
+      "Track issues as Saved, Interested, In Progress, or Completed. Add implementation notes, set monthly contribution goals, and attach verified pull requests.",
+    badge: "Local-First Sync",
+    color: "text-emerald-400",
+  },
+  {
     icon: Gauge,
     title: "Repository Health Scoring",
     description:
-      "Calculates multi-dimensional maintenance health grades (A+ through F) based on push velocity, issue closure ratios, stale backlog volume, and PR response times.",
+      "Calculates multi-dimensional maintenance health grades (A+ through F) based on push velocity, issue closure ratios, stale backlog volume, and PR turnover.",
     badge: "Deterministic",
     color: "text-blue-500",
   },
@@ -31,23 +49,7 @@ const FEATURES = [
     description:
       "Classify issues into bugs, features, or questions with recommended priority, clear reasoning, missing information checklists, and suggested labels.",
     badge: "Optional / Fallback Safe",
-    color: "text-indigo-500",
-  },
-  {
-    icon: FileSpreadsheet,
-    title: "Export & Persistence",
-    description:
-      "Download clean RFC-4180 CSV issue spreadsheets and formatted Markdown intelligence reports. Persist analysis snapshots locally or in PostgreSQL.",
-    badge: "Prisma ORM",
-    color: "text-emerald-500",
-  },
-  {
-    icon: Activity,
-    title: "Stale Backlog Triage",
-    description:
-      "Instantly isolates open issues inactive for >90 days, computes median backlog age, and tracks resolution velocity without manual sorting.",
-    badge: "Velocity Metrics",
-    color: "text-amber-500",
+    color: "text-purple-400",
   },
   {
     icon: ShieldAlert,

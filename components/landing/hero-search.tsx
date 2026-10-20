@@ -57,9 +57,8 @@ export function HeroSearch() {
 
       {/* Supporting text */}
       <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mb-8 leading-relaxed">
-        Analyze public GitHub repositories in seconds. Audit repository health scores,
-        identify stale backlogs, uncover potential duplicate issues, and triage issues
-        with structured AI recommendations.
+        Discover curated beginner-friendly GitHub issues to kickstart your open-source journey,
+        or analyze any public repository for health scoring, duplicate tickets, and AI triage.
       </p>
 
       {/* Main Repository Input Form */}
@@ -103,20 +102,34 @@ export function HeroSearch() {
         )}
       </div>
 
-      {/* Quick sample pills */}
-      <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
-        <span className="font-medium mr-1">Try popular repositories:</span>
-        {SAMPLE_REPOS.map((sample) => (
-          <button
-            key={sample.name}
-            type="button"
-            onClick={() => handleSelectSample(sample.name)}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/50 hover:bg-muted px-2.5 py-1 text-xs font-mono text-foreground hover:border-primary/40 transition-colors"
-          >
-            <span>{sample.name}</span>
-            <span className="text-[10px] text-muted-foreground font-sans">({sample.desc})</span>
-          </button>
-        ))}
+      {/* Quick sample pills & explore link */}
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <span className="font-medium mr-1">Popular repositories:</span>
+          {SAMPLE_REPOS.map((sample) => (
+            <button
+              key={sample.name}
+              type="button"
+              onClick={() => handleSelectSample(sample.name)}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/50 hover:bg-muted px-2.5 py-1 text-xs font-mono text-foreground hover:border-primary/40 transition-colors"
+            >
+              <span>{sample.name}</span>
+              <span className="text-[10px] text-muted-foreground font-sans">({sample.desc})</span>
+            </button>
+          ))}
+        </div>
+
+        <span className="hidden sm:inline text-muted-foreground/40">•</span>
+
+        <button
+          type="button"
+          onClick={() => router.push("/explore")}
+          className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline py-1"
+        >
+          <Sparkles className="h-3.5 w-3.5" />
+          <span>Browse Beginner Issues</span>
+          <ArrowRight className="h-3 w-3" />
+        </button>
       </div>
     </div>
   );

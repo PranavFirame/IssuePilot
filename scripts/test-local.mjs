@@ -36,12 +36,94 @@ async function runLocalTests() {
   console.log("==================================================\n");
 
   // 1. Landing Page
-  const home = await testEndpoint("1. Landing Page (GET /)", `${BASE_URL}/`);
+  await testEndpoint("1. Landing Page (GET /)", `${BASE_URL}/`);
 
-  // 2. Repository Analysis API with real GitHub repo (e.g. octocat/Hello-World or facebook/react)
-  console.log("\nTesting Live GitHub API Ingestion...");
-  const analyze = await testEndpoint(
-    "2. Analyze API (POST /api/analyze with octocat/Hello-World)",
+  // 2. Explore Page
+  await testEndpoint("2. Explore Page (GET /explore)", `${BASE_URL}/explore`);
+
+  // 3. Workspace Page
+  await testEndpoint("3. Workspace Page (GET /workspace)", `${BASE_URL}/workspace`);
+
+  // 4. Explore API
+  console.log("\nTesting Beginner Issues Search API...");
+  const exploreApi = await testEndpoint(
+    "4. Explore API (GET /api/explore?lang=typescript)",
+    `${BASE_URL}/api/explore?lang=typescript&perPage=5`
+  );
+  if (exploreApi.success && exploreApi.json) {
+    console.log(`       Found: ${exploreApi.json.totalCount} issues`);
+    console.log(`       Rate Limit Remaining: ${exploreApi.json.rateLimit?.remaining}`);
+  }
+
+  // 5. User Preferences API
+  console.log("\nTesting User Preferences API...");
+  await testEndpoint(
+    "5. Save Preferences (POST /api/workspace/preferences)",
+    `${BASE_URL}/api/workspace/preferences`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: "smoke-test-user",
+        languages: ["TypeScript", "Rust"],
+        experienceLevel: "beginner",
+        topics: ["web", "cli"],
+        monthlyGoal: 4,
+      }),
+    }
+  );
+
+  // 6. Track Issue in Workspace
+  console.log("\nTesting Workspace Issue Tracking...");
+  let trackedId = null;
+  const trackRes = await testEndpoint(
+    "6. Track Issue (POST /api/workspace)",
+    `${BASE_URL}/api/workspace`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: "smoke-test-user",
+        issueNumber: 999,
+        repoOwner: "test-owner",
+        repoName: "test-repo",
+        title: "Sample beginner task",
+        htmlUrl: "https://github.com/test-owner/test-repo/issues/999",
+        status: "saved",
+        notes: "Test note for workspace",
+      }),
+    }
+  );
+  if (trackRes.success && trackRes.json?.item?.id) {
+    trackedId = trackRes.json.item.id;
+
+    // 7. Link verified PR
+    await testEndpoint(
+      "7. Link Verified PR (PATCH /api/workspace)",
+      `${BASE_URL}/api/workspace`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: trackedId,
+          status: "completed",
+          prUrl: "https://github.com/test-owner/test-repo/pull/1",
+        }),
+      }
+    );
+
+    // 8. Delete tracked item
+    await testEndpoint(
+      "8. Delete Tracked Issue (DELETE /api/workspace)",
+      `${BASE_URL}/api/workspace?id=${trackedId}`,
+      { method: "DELETE" }
+    );
+  }
+
+  // 9. Repository Analysis API
+  console.log("\nTesting Live GitHub Repository Analysis...");
+  await testEndpoint(
+    "9. Analyze API (POST /api/analyze with octocat/Hello-World)",
     `${BASE_URL}/api/analyze`,
     {
       method: "POST",
@@ -49,84 +131,6 @@ async function runLocalTests() {
       body: JSON.stringify({ repo: "octocat/Hello-World" }),
     }
   );
-
-  let savedId = null;
-  if (analyze.success && analyze.json) {
-    console.log(`       Stars: ${analyze.json.repository.stars}`);
-    console.log(`       Health Score: ${analyze.json.health.score} (${analyze.json.health.grade})`);
-    console.log(`       Issues Sampled: ${analyze.json.issues.length}`);
-    console.log(`       Rate Limit Remaining: ${analyze.json.rateLimit.remaining}`);
-
-    // 3. Save Report Snapshot to Database
-    console.log("\nTesting Persistence via Prisma ORM...");
-    const saveReport = await testEndpoint(
-      "3. Save Report (POST /api/reports)",
-      `${BASE_URL}/api/reports`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          owner: analyze.json.repository.owner,
-          repo: analyze.json.repository.repo,
-          repoName: analyze.json.repository.fullName,
-          description: analyze.json.repository.description,
-          stars: analyze.json.repository.stars,
-          forks: analyze.json.repository.forks,
-          openIssues: analyze.json.repository.openIssuesCount,
-          openPrs: analyze.json.repository.openPrCount,
-          healthScore: analyze.json.health.score,
-          primaryLanguage: analyze.json.repository.language,
-          dataSnapshot: JSON.stringify(analyze.json),
-        }),
-      }
-    );
-
-    if (saveReport.success && saveReport.json?.report?.id) {
-      savedId = saveReport.json.report.id;
-      console.log(`       Saved Snapshot ID: ${savedId}`);
-    }
-  }
-
-  // 4. List Saved Reports
-  const listReports = await testEndpoint(
-    "4. List Saved Reports (GET /api/reports)",
-    `${BASE_URL}/api/reports`
-  );
-
-  // 5. Test AI Triage Endpoint (verifying graceful unconfigured fallback)
-  console.log("\nTesting AI Triage Fallback Behavior...");
-  const triage = await testEndpoint(
-    "5. Triage API Fallback (POST /api/triage)",
-    `${BASE_URL}/api/triage`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        issueNumber: 1,
-        title: "Build failure on Windows 11 with Node 20",
-        body: "Reproducible error when running npm install.",
-        author: "tester",
-        repoFullName: "test/repo",
-      }),
-    }
-  );
-
-  // 6. Test Repository Dashboard Route
-  console.log("\nTesting Frontend Dashboard Rendering...");
-  const dashboard = await testEndpoint(
-    "6. Repo Dashboard Page (GET /repo/octocat/Hello-World)",
-    `${BASE_URL}/repo/octocat/Hello-World`
-  );
-
-  // 7. Cleanup Saved Report
-  if (savedId) {
-    console.log("\nTesting Database Cleanup...");
-    await testEndpoint(
-      `7. Delete Report (DELETE /api/reports?id=${savedId})`,
-      `${BASE_URL}/api/reports?id=${savedId}`,
-      { method: "DELETE" }
-    );
-  }
 
   console.log("\n==================================================");
   console.log("   Local Smoke Test Completed Successfully!       ");

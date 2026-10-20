@@ -62,6 +62,29 @@ export function Navbar({ onOpenSavedReports }: NavbarProps) {
             </div>
           </Link>
 
+          {/* Primary Navigation Links */}
+          <nav className="hidden sm:flex items-center gap-1 text-xs font-medium">
+            <Link
+              href="/explore"
+              className="px-2.5 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-primary" />
+              <span>Explore Issues</span>
+            </Link>
+            <Link
+              href="/"
+              className="px-2.5 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+            >
+              Analyzer
+            </Link>
+            <Link
+              href="/workspace"
+              className="px-2.5 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+            >
+              My Workspace
+            </Link>
+          </nav>
+
           {/* Quick inline search for desktop */}
           <form
             onSubmit={handleQuickSubmit}
