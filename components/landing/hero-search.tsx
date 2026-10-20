@@ -2,15 +2,15 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Search, Sparkles, AlertCircle, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Search, AlertCircle, Compass } from "lucide-react";
 import { Button } from "../ui/button";
 import { parseRepositoryUrl } from "@/lib/github/url-parser";
 
 const SAMPLE_REPOS = [
   { name: "facebook/react", desc: "UI Library" },
-  { name: "vercel/next.js", desc: "React Framework" },
-  { name: "tailwindlabs/tailwindcss", desc: "CSS Engine" },
-  { name: "shadcn-ui/ui", desc: "Component System" },
+  { name: "vercel/next.js", desc: "Next.js" },
+  { name: "tailwindlabs/tailwindcss", desc: "Tailwind" },
+  { name: "shadcn-ui/ui", desc: "shadcn/ui" },
 ];
 
 export function HeroSearch() {
@@ -40,97 +40,102 @@ export function HeroSearch() {
   };
 
   return (
-    <div className="flex flex-col items-center text-center max-w-3xl mx-auto py-12 sm:py-16 px-4">
-      {/* Badge pill */}
-      <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-medium text-primary mb-6">
-        <Sparkles className="h-3.5 w-3.5" />
-        <span>Developer-grade repository triage & backlog intelligence</span>
-      </div>
+    <section className="relative overflow-hidden">
+      {/* Background orbs — one orchestrated visual moment */}
+      <div
+        className="hero-orb w-[600px] h-[600px] bg-indigo-600 top-[-120px] left-[-80px]"
+        aria-hidden="true"
+      />
+      <div
+        className="hero-orb w-[400px] h-[400px] bg-violet-600 top-[40px] right-[-60px] opacity-[0.08]"
+        aria-hidden="true"
+      />
 
-      {/* Main headline */}
-      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.1] mb-5">
-        Master your GitHub backlog with{" "}
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-400">
-          precision & AI
-        </span>
-      </h1>
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 lg:py-28">
+        <div className="max-w-3xl">
+          {/* Eyebrow */}
+          <p className="text-sm font-medium text-muted-foreground mb-6 flex items-center gap-2">
+            <Compass className="h-4 w-4 text-primary" />
+            Repository intelligence for open-source contributors
+          </p>
 
-      {/* Supporting text */}
-      <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mb-8 leading-relaxed">
-        Discover curated beginner-friendly GitHub issues to kickstart your open-source journey,
-        or analyze any public repository for health scoring, duplicate tickets, and AI triage.
-      </p>
+          {/* Headline — editorial, left-aligned, no gradient */}
+          <h1 className="text-4xl sm:text-5xl lg:text-[3.75rem] font-bold tracking-[-0.03em] text-foreground leading-[1.08] mb-6">
+            Navigate your GitHub{" "}
+            <br className="hidden sm:block" />
+            backlog with clarity.
+          </h1>
 
-      {/* Main Repository Input Form */}
-      <div className="w-full max-w-2xl mb-6">
-        <form
-          onSubmit={(e) => handleSubmit(e)}
-          className="relative flex flex-col sm:flex-row items-center gap-2 p-1.5 rounded-xl border border-border bg-card/80 backdrop-blur shadow-lg shadow-primary/5 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all"
-        >
-          <div className="relative flex-1 w-full flex items-center">
-            <Search className="absolute left-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => {
-                setInput(e.target.value);
-                if (error) setError(null);
-              }}
-              placeholder="e.g. facebook/react or https://github.com/owner/repo"
-              className="w-full bg-transparent pl-10 pr-3 py-2.5 text-sm sm:text-base text-foreground placeholder:text-muted-foreground/70 focus:outline-none"
-              autoFocus
-            />
-          </div>
+          {/* Supporting copy */}
+          <p className="text-[15px] sm:text-base text-muted-foreground max-w-[52ch] mb-10 leading-relaxed">
+            Analyze any public repository for health scoring, stale issues, and duplicate detection.
+            Discover beginner-friendly contribution opportunities with explainable relevance scoring.
+          </p>
 
-          <Button
-            type="submit"
-            isLoading={isLoading}
-            size="lg"
-            className="w-full sm:w-auto h-11 px-6 font-semibold gap-2 shadow-md shrink-0"
+          {/* Main form */}
+          <form
+            onSubmit={(e) => handleSubmit(e)}
+            className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6 max-w-xl"
           >
-            <span>Analyze Repository</span>
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        </form>
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 pointer-events-none" />
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  if (error) setError(null);
+                }}
+                placeholder="owner/repo or GitHub URL"
+                className="w-full rounded-xl border border-border bg-card/80 pl-10 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary/60 focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all backdrop-blur-sm"
+                autoFocus
+              />
+            </div>
 
-        {/* Validation / Error message */}
-        {error && (
-          <div className="mt-3 flex items-center justify-center gap-2 text-xs font-medium text-destructive animate-in fade-in slide-in-from-top-1">
-            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Quick sample pills & explore link */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-xs text-muted-foreground">
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <span className="font-medium mr-1">Popular repositories:</span>
-          {SAMPLE_REPOS.map((sample) => (
-            <button
-              key={sample.name}
-              type="button"
-              onClick={() => handleSelectSample(sample.name)}
-              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card/50 hover:bg-muted px-2.5 py-1 text-xs font-mono text-foreground hover:border-primary/40 transition-colors"
+            <Button
+              type="submit"
+              isLoading={isLoading}
+              size="lg"
+              className="h-[46px] px-6 font-semibold text-sm gap-2 rounded-xl shrink-0"
             >
-              <span>{sample.name}</span>
-              <span className="text-[10px] text-muted-foreground font-sans">({sample.desc})</span>
+              Analyze
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </form>
+
+          {/* Validation error */}
+          {error && (
+            <div className="mb-6 flex items-center gap-2 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Sample repos + explore link */}
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
+            <span className="text-muted-foreground/60">Try:</span>
+            {SAMPLE_REPOS.map((sample) => (
+              <button
+                key={sample.name}
+                type="button"
+                onClick={() => handleSelectSample(sample.name)}
+                className="font-mono text-xs text-muted-foreground hover:text-primary transition-colors link-underline underline underline-offset-2 decoration-border hover:decoration-primary/50"
+              >
+                {sample.name}
+              </button>
+            ))}
+            <span className="text-muted-foreground/30 hidden sm:inline">·</span>
+            <button
+              type="button"
+              onClick={() => router.push("/explore")}
+              className="text-primary hover:text-primary/80 font-medium transition-colors flex items-center gap-1"
+            >
+              Browse beginner issues
+              <ArrowRight className="h-3.5 w-3.5" />
             </button>
-          ))}
+          </div>
         </div>
-
-        <span className="hidden sm:inline text-muted-foreground/40">•</span>
-
-        <button
-          type="button"
-          onClick={() => router.push("/explore")}
-          className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline py-1"
-        >
-          <Sparkles className="h-3.5 w-3.5" />
-          <span>Browse Beginner Issues</span>
-          <ArrowRight className="h-3 w-3" />
-        </button>
       </div>
-    </div>
+    </section>
   );
 }

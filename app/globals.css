@@ -8,40 +8,40 @@
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
-    --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
     --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 210 40% 92%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 220 14% 92%;
     --accent-foreground: 222 47% 11%;
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 221 83% 53%;
-    --radius: 0.5rem;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 239 84% 67%;
+    --radius: 0.625rem;
   }
 
   .dark {
-    --background: 224 40% 5%;
-    --foreground: 210 40% 98%;
-    --card: 224 35% 8%;
-    --card-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 222 30% 12%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 223 30% 12%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 223 30% 15%;
-    --accent-foreground: 210 40% 98%;
+    --background: 227 52% 5%;
+    --foreground: 213 31% 94%;
+    --card: 226 48% 7%;
+    --card-foreground: 213 31% 94%;
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 225 38% 10%;
+    --secondary-foreground: 213 31% 94%;
+    --muted: 225 35% 10%;
+    --muted-foreground: 218 16% 56%;
+    --accent: 225 35% 13%;
+    --accent-foreground: 213 31% 94%;
     --destructive: 0 72% 51%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 223 25% 15%;
-    --input: 223 25% 15%;
-    --ring: 217 91% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 224 28% 14%;
+    --input: 224 28% 14%;
+    --ring: 239 84% 67%;
   }
 }
 
@@ -72,4 +72,33 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Gradient orb for hero */
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  opacity: 0.15;
+}
+
+/* Refined link underlines */
+.link-underline {
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+/* Card hover lift */
+.card-lift {
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+.card-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.08);
 }

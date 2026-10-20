@@ -8,98 +8,91 @@ import {
   Sparkles,
   BookmarkCheck,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
 
 const FEATURES = [
   {
     icon: Sparkles,
     title: "Beginner Issue Discovery",
     description:
-      "Curates accessible starter tickets tagged 'good first issue', 'help wanted', and 'documentation' across GitHub with explainable language and skill relevance scoring.",
-    badge: "Open Source Radar",
-    color: "text-indigo-400",
+      "Curates accessible starter tickets tagged good first issue and help wanted across GitHub, with explainable language and skill relevance scoring.",
+    accent: "text-indigo-400",
+    bg: "bg-indigo-500/10",
   },
   {
     icon: BookmarkCheck,
     title: "Personal Contributor Workspace",
     description:
       "Track issues as Saved, Interested, In Progress, or Completed. Add implementation notes, set monthly contribution goals, and attach verified pull requests.",
-    badge: "Local-First Sync",
-    color: "text-emerald-400",
+    accent: "text-emerald-400",
+    bg: "bg-emerald-500/10",
   },
   {
     icon: Gauge,
     title: "Repository Health Scoring",
     description:
       "Calculates multi-dimensional maintenance health grades (A+ through F) based on push velocity, issue closure ratios, stale backlog volume, and PR turnover.",
-    badge: "Deterministic",
-    color: "text-blue-500",
+    accent: "text-blue-400",
+    bg: "bg-blue-500/10",
   },
   {
     icon: CopyCheck,
     title: "Duplicate Issue Radar",
     description:
       "Automated TF-IDF and weighted token cosine similarity scans titles and descriptions to uncover related or duplicate tickets before engineers duplicate work.",
-    badge: "NLP Vectorization",
-    color: "text-cyan-500",
+    accent: "text-cyan-400",
+    bg: "bg-cyan-500/10",
   },
   {
     icon: BrainCircuit,
     title: "AI Backlog Triage",
     description:
       "Classify issues into bugs, features, or questions with recommended priority, clear reasoning, missing information checklists, and suggested labels.",
-    badge: "Optional / Fallback Safe",
-    color: "text-purple-400",
+    accent: "text-violet-400",
+    bg: "bg-violet-500/10",
   },
   {
     icon: ShieldAlert,
-    title: "SSRF & Injection Defense",
+    title: "Security by Default",
     description:
       "Domain-validated GitHub API routes with sanitized inputs. Issue content is treated as untrusted data with strict XML-fenced boundaries for AI models.",
-    badge: "Security Hardened",
-    color: "text-rose-500",
+    accent: "text-rose-400",
+    bg: "bg-rose-500/10",
   },
 ];
 
 export function FeatureGrid() {
   return (
-    <section className="py-12 border-t border-border/40">
+    <section className="py-20 border-t border-border/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-3">
-            Engineered for Maintainers & Teams
+        <div className="mb-12">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-[-0.02em] text-foreground mb-3">
+            Engineered for maintainers and teams
           </h2>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Clear signals, reproducible metrics, and actionable recommendations without
-            bloat or fake numbers.
+          <p className="text-[15px] text-muted-foreground max-w-[48ch] leading-relaxed">
+            Clear signals, reproducible metrics, and actionable recommendations — no invented data.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border/40 rounded-2xl overflow-hidden border border-border/40">
           {FEATURES.map((f, i) => {
             const Icon = f.icon;
             return (
-              <Card
+              <div
                 key={i}
-                className="bg-card/60 backdrop-blur border-border/80 hover:border-primary/40 transition-colors shadow-sm"
+                className="bg-background hover:bg-accent/30 transition-colors p-7 space-y-4 card-lift"
               >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className={`p-2 rounded-lg bg-muted/60 ${f.color}`}>
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-muted text-muted-foreground">
-                      {f.badge}
-                    </span>
-                  </div>
-                  <CardTitle className="text-base font-semibold">{f.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-xs sm:text-sm leading-relaxed">
+                <div className={`inline-flex p-2.5 rounded-xl ${f.bg} ${f.accent}`}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-[15px] font-semibold text-foreground mb-2 tracking-[-0.01em]">
+                    {f.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {f.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
+                  </p>
+                </div>
+              </div>
             );
           })}
         </div>
