@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model SavedAnalysis {
+  id              String   @id @default(cuid())
+  owner           String
+  repo            String
+  repoName        String
+  description     String?
+  stars           Int      @default(0)
+  forks           Int      @default(0)
+  openIssues      Int      @default(0)
+  openPrs         Int      @default(0)
+  healthScore     Int      @default(0)
+  primaryLanguage String?
+  dataSnapshot    String   // JSON serialized full analysis data
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([owner, repo])
+  @@index([createdAt])
+}
+
+model TriageSnapshot {
+  id              String   @id @default(cuid())
+  owner           String
+  repo            String
+  issueNumber     Int
+  issueTitle      String
+  category        String   // bug, feature, docs, question, enhancement
+  priority        String   // critical, high, medium, low
+  confidence      Float?
+  reasoning       String
+  missingInfo     String   // JSON array of strings
+  suggestedLabels String   // JSON array of strings
+  createdAt       DateTime @default(now())
+
+  @@index([owner, repo, issueNumber])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  target    String
+  metadata  String?
+  createdAt DateTime @default(now())
+
+  @@index([action, createdAt])
+}
