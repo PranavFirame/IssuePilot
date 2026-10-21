@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Search, SlidersHorizontal, RotateCcw, Sparkles } from "lucide-react";
 import { Button } from "../ui/button";
+import { SavedSearches } from "./saved-searches";
 
 interface FilterPanelProps {
   query: string;
@@ -17,6 +18,8 @@ interface FilterPanelProps {
   }) => void;
   onResetFilters: () => void;
   onOpenPreferences?: () => void;
+  /** Called when user applies a saved search — replaces all active filters */
+  onApplySavedSearch?: (filters: { query: string; language: string; difficulty: string; sort: string }) => void;
 }
 
 const LANGUAGES = [
@@ -51,6 +54,7 @@ export function FilterPanel({
   onFilterChange,
   onResetFilters,
   onOpenPreferences,
+  onApplySavedSearch,
 }: FilterPanelProps) {
   const [searchInput, setSearchInput] = React.useState(query);
 
@@ -58,8 +62,27 @@ export function FilterPanel({
     setSearchInput(query);
   }, [query]);
 
+  // Debounce: fire onFilterChange 600ms after user stops typing
+  const debounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchInput(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      onFilterChange({ query: value });
+    }, 600);
+  };
+
+  React.useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     onFilterChange({ query: searchInput });
   };
 
@@ -74,9 +97,10 @@ export function FilterPanel({
           <input
             type="text"
             value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+            onChange={handleSearchChange}
             placeholder="Search beginner issues (e.g., react, cli, parser, docs)..."
             className="w-full rounded-md border border-border bg-background/60 pl-9 pr-20 py-1.5 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+            aria-label="Search beginner issues"
           />
           {searchInput !== query && (
             <button
@@ -141,6 +165,14 @@ export function FilterPanel({
               <RotateCcw className="h-3 w-3" />
               <span>Reset</span>
             </Button>
+          )}
+
+          {/* Saved Searches Dropdown */}
+          {onApplySavedSearch && (
+            <SavedSearches
+              currentFilters={{ query, language, difficulty, sort }}
+              onApply={onApplySavedSearch}
+            />
           )}
 
           {/* Preferences Button */}

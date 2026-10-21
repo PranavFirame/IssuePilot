@@ -138,6 +138,21 @@ function ExploreContent() {
     router.push("/explore");
   };
 
+  const handleApplySavedSearch = (saved: {
+    query: string;
+    language: string;
+    difficulty: string;
+    sort: string;
+  }) => {
+    const params = new URLSearchParams();
+    if (saved.query) params.set("q", saved.query);
+    if (saved.language && saved.language !== "all") params.set("lang", saved.language);
+    if (saved.difficulty && saved.difficulty !== "all") params.set("difficulty", saved.difficulty);
+    if (saved.sort) params.set("sort", saved.sort);
+    params.set("page", "1");
+    router.push(`/explore?${params.toString()}`);
+  };
+
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", String(newPage));
@@ -240,6 +255,7 @@ function ExploreContent() {
           onFilterChange={handleFilterChange}
           onResetFilters={handleResetFilters}
           onOpenPreferences={() => setIsPrefsOpen(true)}
+          onApplySavedSearch={handleApplySavedSearch}
         />
 
         {/* Rate limit warning banner */}

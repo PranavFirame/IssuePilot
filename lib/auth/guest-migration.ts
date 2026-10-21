@@ -123,10 +123,17 @@ export async function migrateGuestData(
       data: { userId: targetUserId },
     });
 
+    // 4b. Migrate Saved Searches
+    await prisma.savedSearch.updateMany({
+      where: { userId: guestId },
+      data: { userId: targetUserId },
+    });
+
     // 5. Cleanup remaining guest records
     await prisma.trackedIssue.deleteMany({ where: { userId: guestId } });
     await prisma.userPreference.deleteMany({ where: { userId: guestId } });
     await prisma.savedAnalysis.deleteMany({ where: { userId: guestId } });
+    await prisma.savedSearch.deleteMany({ where: { userId: guestId } });
 
     // 6. Clear guest cookie on response
     if (res) {
