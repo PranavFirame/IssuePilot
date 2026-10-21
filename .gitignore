@@ -37,3 +37,7 @@ dev.db-journal
 
 # Prisma
 /prisma/migrations
+
+# Agent Skills & Assistant Configuration
+.agent/
+.skills/

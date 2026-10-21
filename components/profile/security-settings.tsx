@@ -74,12 +74,12 @@ export function SecuritySettings() {
       )}
 
       {/* Password & Authentication */}
-      <div className="p-4 sm:p-5 rounded-xl border border-border/80 bg-card/40 space-y-3">
+      <div className="glass-card p-4 sm:p-5 space-y-3 shadow-sm">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
               <KeyRound className="h-4 w-4 text-primary" />
-              <span>Password & Credentials</span>
+              <span>Password &amp; Credentials</span>
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
               To update your account password, request a secure verification link to your registered email.
@@ -87,7 +87,7 @@ export function SecuritySettings() {
           </div>
           <Button
             type="button"
-            variant="outline"
+            variant="glass"
             size="sm"
             onClick={() => router.push("/auth/forgot-password")}
             className="text-xs shrink-0"
@@ -98,12 +98,12 @@ export function SecuritySettings() {
       </div>
 
       {/* Clear Personal Bookmarks */}
-      <div className="p-4 sm:p-5 rounded-xl border border-border/80 bg-card/40 space-y-3">
+      <div className="glass-card p-4 sm:p-5 space-y-3 shadow-sm">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
               <Trash2 className="h-4 w-4 text-muted-foreground" />
-              <span>Clear Workspace Bookmarks & History</span>
+              <span>Clear Workspace Bookmarks &amp; History</span>
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
               Remove all tracked issues, notes, and recently viewed tickets while keeping your account and profile active.
@@ -111,7 +111,7 @@ export function SecuritySettings() {
           </div>
           <Button
             type="button"
-            variant="outline"
+            variant="glass"
             size="sm"
             onClick={handleClearData}
             isLoading={isClearingData}
@@ -123,7 +123,7 @@ export function SecuritySettings() {
       </div>
 
       {/* Session Sign Out */}
-      <div className="p-4 sm:p-5 rounded-xl border border-border/80 bg-card/40 space-y-3">
+      <div className="glass-card p-4 sm:p-5 space-y-3">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
@@ -147,7 +147,7 @@ export function SecuritySettings() {
       </div>
 
       {/* Danger Zone: Account Deletion */}
-      <div className="p-4 sm:p-5 rounded-xl border border-destructive/30 bg-destructive/5 space-y-4">
+      <div className="glass-card p-4 sm:p-5 border-destructive/30 bg-destructive/5 space-y-4">
         <div>
           <h3 className="text-sm font-semibold text-destructive flex items-center gap-1.5">
             <AlertTriangle className="h-4 w-4" />

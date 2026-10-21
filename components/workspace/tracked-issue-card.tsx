@@ -54,7 +54,7 @@ export function TrackedIssueCard({
   };
 
   return (
-    <div className="rounded-xl border border-border/80 bg-card/60 backdrop-blur hover:border-primary/40 transition-colors p-4 space-y-3 shadow-sm">
+    <div className="glass-card-interactive p-4 sm:p-5 space-y-3.5">
       {/* Top Header */}
       <div className="flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex items-center gap-2">
@@ -62,7 +62,7 @@ export function TrackedIssueCard({
             href={`https://github.com/${item.repoOwner}/${item.repoName}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs font-mono font-semibold text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs font-mono font-semibold text-muted-foreground hover:text-foreground transition-colors max-w-[160px] sm:max-w-none truncate"
           >
             {item.repoOwner}/{item.repoName}
           </a>
@@ -92,7 +92,7 @@ export function TrackedIssueCard({
           </button>
 
           {showStatusMenu && (
-            <div className="absolute right-0 top-full mt-1 z-30 w-36 rounded-lg border border-border bg-card p-1 shadow-lg text-xs space-y-0.5 animate-in fade-in zoom-in-95">
+            <div className="absolute right-0 top-full mt-1 z-30 w-36 rounded-xl border border-border bg-white p-1 shadow-2xl text-xs space-y-0.5 animate-in fade-in zoom-in-95">
               {(["saved", "interested", "in_progress", "completed"] as const).map((st) => (
                 <button
                   key={st}
@@ -181,13 +181,13 @@ export function TrackedIssueCard({
       )}
 
       {/* Footer Controls */}
-      <div className="flex items-center justify-between pt-2 border-t border-border/60 text-xs">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border/60 text-xs">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => onEditNotes(item)}
-            className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1"
+            className="h-8 sm:h-7 text-xs text-muted-foreground hover:text-foreground gap-1 px-2.5 sm:px-2"
           >
             <FileText className="h-3 w-3" />
             <span>{item.notes ? "Edit Notes" : "+ Add Note"}</span>
@@ -197,7 +197,7 @@ export function TrackedIssueCard({
             variant="ghost"
             size="sm"
             onClick={() => setShowBreakdown(!showBreakdown)}
-            className="h-7 text-xs text-cyan-400 hover:text-cyan-300 gap-1"
+            className="h-8 sm:h-7 text-xs text-cyan-400 hover:text-cyan-300 gap-1 px-2.5 sm:px-2"
           >
             <Sparkles className="h-3 w-3" />
             <span>{showBreakdown ? "Hide Breakdown" : "Breakdown & Skills"}</span>
@@ -208,7 +208,7 @@ export function TrackedIssueCard({
               variant="ghost"
               size="sm"
               onClick={() => onLinkPr(item)}
-              className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1"
+              className="h-8 sm:h-7 text-xs text-muted-foreground hover:text-foreground gap-1 px-2.5 sm:px-2"
             >
               <GitPullRequest className="h-3 w-3" />
               <span>Link PR</span>

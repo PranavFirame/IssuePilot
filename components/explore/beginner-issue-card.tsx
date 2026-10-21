@@ -60,7 +60,7 @@ export function BeginnerIssueCard({
   };
 
   return (
-    <div className="rounded-xl border border-border/80 bg-card/60 backdrop-blur hover:border-primary/40 transition-colors p-4 sm:p-5 space-y-3 shadow-sm">
+    <div className="glass-card-interactive p-4 sm:p-5 space-y-3.5">
       {/* Top Header: Repo, Difficulty, Freshness */}
       <div className="flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex items-center gap-2.5 min-w-0">
@@ -79,7 +79,7 @@ export function BeginnerIssueCard({
             href={issue.repository.htmlUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs font-mono font-semibold text-foreground hover:text-primary transition-colors truncate"
+            className="text-xs font-mono font-semibold text-foreground hover:text-primary transition-colors truncate max-w-[140px] sm:max-w-none"
           >
             {issue.repository.fullName}
           </a>
@@ -183,14 +183,14 @@ export function BeginnerIssueCard({
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
           {/* Tracking Dropdown */}
           <div className="relative">
             <Button
               variant={isSaved ? "secondary" : "outline"}
               size="sm"
               onClick={() => setShowStatusMenu(!showStatusMenu)}
-              className="h-7 text-xs gap-1.5"
+              className="h-8 sm:h-7 text-xs gap-1.5"
             >
               {isSaved ? (
                 <>
@@ -207,7 +207,7 @@ export function BeginnerIssueCard({
             </Button>
 
             {showStatusMenu && (
-              <div className="absolute right-0 bottom-full mb-1 z-30 w-36 rounded-lg border border-border bg-card p-1 shadow-lg text-xs space-y-0.5 animate-in fade-in zoom-in-95">
+              <div className="absolute left-0 sm:left-auto sm:right-0 bottom-full mb-1.5 z-30 w-36 rounded-xl border border-border bg-white p-1 shadow-2xl text-xs space-y-0.5 animate-in fade-in zoom-in-95">
                 {(["saved", "interested", "in_progress", "completed"] as const).map((st) => (
                   <button
                     key={st}
@@ -216,7 +216,7 @@ export function BeginnerIssueCard({
                       onTrackIssue(issue, st);
                       setShowStatusMenu(false);
                     }}
-                    className={`w-full text-left px-2.5 py-1.5 rounded-md transition-colors flex items-center justify-between ${
+                    className={`w-full text-left px-2.5 py-1.5 rounded-md transition-colors flex items-center justify-between cursor-pointer ${
                       currentStatus === st
                         ? "bg-primary text-primary-foreground font-medium"
                         : "hover:bg-muted text-foreground"
@@ -230,27 +230,29 @@ export function BeginnerIssueCard({
             )}
           </div>
 
-          {/* AI Triage Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onTriageIssue(issue)}
-            className="h-7 text-xs gap-1 text-primary hover:text-primary hover:bg-primary/10"
-          >
-            <Sparkles className="h-3 w-3" />
-            <span>AI Triage</span>
-          </Button>
+          <div className="flex items-center gap-1.5">
+            {/* AI Triage Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onTriageIssue(issue)}
+              className="h-8 sm:h-7 text-xs gap-1 text-primary hover:text-primary hover:bg-primary/10"
+            >
+              <Sparkles className="h-3 w-3" />
+              <span>AI Triage</span>
+            </Button>
 
-          {/* GitHub Direct Link */}
-          <a
-            href={issue.htmlUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center h-7 px-2.5 rounded-md border border-border text-foreground hover:bg-muted transition-colors"
-            title="Inspect on GitHub"
-          >
-            <ExternalLink className="h-3.5 w-3.5" />
-          </a>
+            {/* GitHub Direct Link */}
+            <a
+              href={issue.htmlUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center h-8 sm:h-7 px-2.5 rounded-md border border-border text-foreground hover:bg-muted transition-colors"
+              title="Inspect on GitHub"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+          </div>
         </div>
       </div>
     </div>

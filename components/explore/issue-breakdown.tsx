@@ -91,12 +91,12 @@ export function IssueBreakdown({
           <Info className="h-3.5 w-3.5 text-primary" />
           <span>Issue Breakdown &amp; Plain-Language Goal</span>
         </p>
-        <p className="text-muted-foreground leading-relaxed text-[11px] pl-5">{summary}</p>
+        <p className="text-muted-foreground leading-relaxed text-[11px] pl-0 sm:pl-5">{summary}</p>
       </div>
 
       {/* Likely Skills Involved */}
       {skills.length > 0 && (
-        <div className="space-y-1.5 pl-5">
+        <div className="space-y-1.5 pl-0 sm:pl-5">
           <p className="text-[11px] font-medium text-foreground flex items-center gap-1.5">
             <Code2 className="h-3 w-3 text-cyan-400" />
             <span>Likely Relevant Skills:</span>
@@ -115,7 +115,7 @@ export function IssueBreakdown({
       )}
 
       {/* Quick Setup & Contribution Links */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-2 border-t border-border/60 text-[11px] pl-5">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-2 border-t border-border/60 text-[11px] pl-0 sm:pl-5">
         <a
           href={contributingUrl}
           target="_blank"
@@ -138,7 +138,7 @@ export function IssueBreakdown({
           <ExternalLink className="h-2.5 w-2.5" />
         </a>
 
-        <span className="text-[10px] text-muted-foreground/60 italic ml-auto">
+        <span className="text-[10px] text-muted-foreground/60 italic w-full sm:w-auto sm:ml-auto">
           Heuristic skill matching • Not AI certainty
         </span>
       </div>

@@ -21,9 +21,9 @@ export function DuplicateDetector({ issues }: DuplicateDetectorProps) {
   return (
     <div className="space-y-5">
       {/* Control bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-border bg-card">
+      <div className="glass-card p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-500">
+          <div className="p-2.5 rounded-xl border border-cyan-500/20 bg-cyan-500/10 text-cyan-500 backdrop-blur-md">
             <CopyCheck className="h-5 w-5" />
           </div>
           <div>
@@ -39,12 +39,12 @@ export function DuplicateDetector({ issues }: DuplicateDetectorProps) {
           <span className="text-muted-foreground flex items-center gap-1">
             <SlidersHorizontal className="h-3.5 w-3.5" /> Sensitivity:
           </span>
-          <div className="inline-flex rounded-lg border border-border p-0.5 bg-muted/40">
+          <div className="inline-flex rounded-xl border border-border/70 dark:border-white/10 p-1 bg-muted/40 dark:bg-white/5 backdrop-blur-md">
             <button
               type="button"
               onClick={() => setThreshold(0.5)}
-              className={`px-2.5 py-1 text-xs rounded-md transition-all ${
-                threshold >= 0.5 ? "bg-background text-foreground font-semibold shadow-sm" : "text-muted-foreground"
+              className={`px-2.5 py-1 text-xs rounded-lg transition-all cursor-pointer ${
+                threshold >= 0.5 ? "bg-background dark:bg-card text-foreground font-semibold shadow-sm border border-border/60 dark:border-white/10" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Strict (50%+)
@@ -52,8 +52,8 @@ export function DuplicateDetector({ issues }: DuplicateDetectorProps) {
             <button
               type="button"
               onClick={() => setThreshold(0.38)}
-              className={`px-2.5 py-1 text-xs rounded-md transition-all ${
-                threshold === 0.38 ? "bg-background text-foreground font-semibold shadow-sm" : "text-muted-foreground"
+              className={`px-2.5 py-1 text-xs rounded-lg transition-all cursor-pointer ${
+                threshold === 0.38 ? "bg-background dark:bg-card text-foreground font-semibold shadow-sm border border-border/60 dark:border-white/10" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Balanced (38%+)
@@ -61,8 +61,8 @@ export function DuplicateDetector({ issues }: DuplicateDetectorProps) {
             <button
               type="button"
               onClick={() => setThreshold(0.28)}
-              className={`px-2.5 py-1 text-xs rounded-md transition-all ${
-                threshold <= 0.28 ? "bg-background text-foreground font-semibold shadow-sm" : "text-muted-foreground"
+              className={`px-2.5 py-1 text-xs rounded-lg transition-all cursor-pointer ${
+                threshold <= 0.28 ? "bg-background dark:bg-card text-foreground font-semibold shadow-sm border border-border/60 dark:border-white/10" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Broad (28%+)
@@ -73,16 +73,18 @@ export function DuplicateDetector({ issues }: DuplicateDetectorProps) {
 
       {/* Candidates List */}
       {candidates.length === 0 ? (
-        <Card className="border-dashed p-10 text-center">
-          <CopyCheck className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
-          <h4 className="text-sm font-semibold text-foreground mb-1">
+        <div className="glass-card p-10 sm:p-12 text-center space-y-3">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-500 backdrop-blur-md shadow-sm">
+            <CopyCheck className="h-6 w-6" />
+          </div>
+          <h4 className="text-base font-bold text-foreground mb-1">
             No high-confidence duplicate pairs detected
           </h4>
-          <p className="text-xs text-muted-foreground max-w-sm mx-auto mb-4">
+          <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
             No two issues in the current sample met the {Math.round(threshold * 100)}% similarity
             threshold. Try setting sensitivity to <strong>Broad</strong>.
           </p>
-        </Card>
+        </div>
       ) : (
         <div className="space-y-3">
           <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
@@ -91,12 +93,12 @@ export function DuplicateDetector({ issues }: DuplicateDetectorProps) {
           </div>
 
           {candidates.map((pair, idx) => (
-            <Card
+            <div
               key={idx}
-              className="border-border/80 hover:border-cyan-500/40 transition-colors p-4 space-y-3"
+              className="glass-card-interactive p-4 sm:p-5 space-y-3.5"
             >
               {/* Header Match % and Explanation */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-border/60">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-border/60 dark:border-white/10">
                 <div className="flex items-center gap-2">
                   <Badge
                     variant={pair.similarityScore >= 60 ? "destructive" : "warning"}
@@ -125,7 +127,7 @@ export function DuplicateDetector({ issues }: DuplicateDetectorProps) {
               {/* Pair Comparison */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 text-xs">
                 {/* Primary Issue */}
-                <div className="p-3 rounded-lg border border-border bg-muted/20 space-y-1.5">
+                <div className="p-3.5 rounded-xl border border-border/70 dark:border-white/10 bg-background/50 dark:bg-card/40 backdrop-blur-md space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-mono text-primary font-semibold">
                       #{pair.primaryIssue.number}
@@ -152,7 +154,7 @@ export function DuplicateDetector({ issues }: DuplicateDetectorProps) {
                 </div>
 
                 {/* Similar Issue */}
-                <div className="p-3 rounded-lg border border-border bg-muted/20 space-y-1.5">
+                <div className="p-3.5 rounded-xl border border-border/70 dark:border-white/10 bg-background/50 dark:bg-card/40 backdrop-blur-md space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-mono text-primary font-semibold">
                       #{pair.similarIssue.number}
@@ -178,7 +180,7 @@ export function DuplicateDetector({ issues }: DuplicateDetectorProps) {
                   </a>
                 </div>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}

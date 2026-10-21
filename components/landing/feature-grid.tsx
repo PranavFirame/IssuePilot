@@ -62,7 +62,7 @@ const FEATURES = [
 
 export function FeatureGrid() {
   return (
-    <section className="py-20 border-t border-border/40">
+    <section className="py-20 border-t border-border/60 dark:border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="mb-12">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-[-0.02em] text-foreground mb-3">
@@ -73,19 +73,19 @@ export function FeatureGrid() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border/40 rounded-2xl overflow-hidden border border-border/40">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {FEATURES.map((f, i) => {
             const Icon = f.icon;
             return (
               <div
                 key={i}
-                className="bg-background hover:bg-accent/30 transition-colors p-7 space-y-4 card-lift"
+                className="glass-card-interactive p-7 space-y-4 group"
               >
-                <div className={`inline-flex p-2.5 rounded-xl ${f.bg} ${f.accent}`}>
+                <div className={`inline-flex p-3 rounded-xl border border-border/60 dark:border-white/10 backdrop-blur-md ${f.bg} ${f.accent} group-hover:scale-105 transition-transform`}>
                   <Icon className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-[15px] font-semibold text-foreground mb-2 tracking-[-0.01em]">
+                  <h3 className="text-[16px] font-semibold text-foreground mb-2 tracking-[-0.01em] group-hover:text-primary transition-colors">
                     {f.title}
                   </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">

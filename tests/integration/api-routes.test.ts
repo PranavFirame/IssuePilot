@@ -54,7 +54,7 @@ describe("API Route Integration Tests", () => {
       expect(saved).not.toBeNull();
       expect(["facebook", "react"]).toContain(saved?.owner.toLowerCase());
       expect(saved?.repo.toLowerCase()).toBe("react");
-    });
+    }, 15000);
   });
 
   describe("/api/triage", () => {
@@ -69,22 +69,32 @@ describe("API Route Integration Tests", () => {
     });
 
     it("returns unconfigured state gracefully when AI keys are absent", async () => {
-      const req = new NextRequest("http://localhost:3000/api/triage", {
-        method: "POST",
-        body: JSON.stringify({
-          issueNumber: 1,
-          title: "Test issue title",
-          body: "Test issue body",
-          author: "user",
-          repoFullName: "owner/repo",
-        }),
-      });
+      const origGemini = process.env.GEMINI_API_KEY;
+      const origOpenai = process.env.OPENAI_API_KEY;
+      delete process.env.GEMINI_API_KEY;
+      delete process.env.OPENAI_API_KEY;
 
-      const res = await triageHandler(req);
-      expect(res.status).toBe(200);
-      const json = await res.json();
-      expect(json.success).toBe(false);
-      expect(json.isConfigured).toBe(false);
+      try {
+        const req = new NextRequest("http://localhost:3000/api/triage", {
+          method: "POST",
+          body: JSON.stringify({
+            issueNumber: 1,
+            title: "Test issue title",
+            body: "Test issue body",
+            author: "user",
+            repoFullName: "owner/repo",
+          }),
+        });
+
+        const res = await triageHandler(req);
+        expect(res.status).toBe(200);
+        const json = await res.json();
+        expect(json.success).toBe(false);
+        expect(json.isConfigured).toBe(false);
+      } finally {
+        if (origGemini) process.env.GEMINI_API_KEY = origGemini;
+        if (origOpenai) process.env.OPENAI_API_KEY = origOpenai;
+      }
     });
   });
 

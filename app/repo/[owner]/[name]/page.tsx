@@ -86,16 +86,26 @@ export default function RepositoryDashboardPage() {
   }, [loadRepositoryData]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background selection:bg-primary/20">
+    <div className="min-h-screen flex flex-col bg-background selection:bg-primary/20 relative overflow-hidden">
+      {/* Ambient background glow orbs */}
+      <div
+        className="hero-orb w-[600px] h-[600px] bg-indigo-600 top-[-100px] left-[-80px]"
+        aria-hidden="true"
+      />
+      <div
+        className="hero-orb w-[450px] h-[450px] bg-cyan-600 top-[80px] right-[-60px] opacity-[0.10]"
+        aria-hidden="true"
+      />
+
       <Navbar onOpenSavedReports={() => setIsSavedReportsOpen(true)} />
 
-      <main className="flex-1 container mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+      <main className="flex-1 container mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 space-y-6 relative">
         {/* Navigation Breadcrumb / Back button */}
         <div className="flex items-center justify-between">
           <button
             type="button"
             onClick={() => router.push("/")}
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border/80 dark:border-white/10 bg-background/50 dark:bg-card/50 backdrop-blur-md text-xs font-medium text-muted-foreground hover:text-foreground transition-all shadow-sm hover:border-primary/40 cursor-pointer"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>Analyze another repository</span>
@@ -106,7 +116,7 @@ export default function RepositoryDashboardPage() {
               variant="ghost"
               size="sm"
               onClick={() => loadRepositoryData(true)}
-              className="text-xs h-7 gap-1"
+              className="text-xs h-8 gap-1.5 border border-border/60 hover:bg-muted/50 rounded-lg"
             >
               <RefreshCw className="h-3 w-3" />
               <span>Refresh live data</span>
@@ -117,28 +127,28 @@ export default function RepositoryDashboardPage() {
         {/* Loading Skeleton */}
         {isLoading && (
           <div className="space-y-6 animate-pulse">
-            <div className="h-32 rounded-xl bg-card/60 border border-border" />
+            <div className="h-32 rounded-2xl bg-card/60 border border-border" />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="h-44 rounded-xl bg-card/60 border border-border" />
-              <div className="md:col-span-3 h-44 rounded-xl bg-card/60 border border-border" />
+              <div className="h-44 rounded-2xl bg-card/60 border border-border" />
+              <div className="md:col-span-3 h-44 rounded-2xl bg-card/60 border border-border" />
             </div>
-            <div className="h-96 rounded-xl bg-card/60 border border-border" />
+            <div className="h-96 rounded-2xl bg-card/60 border border-border" />
           </div>
         )}
 
         {/* Error State */}
         {!isLoading && error && (
-          <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-8 text-center space-y-4 max-w-2xl mx-auto my-12">
+          <div className="glass-card rounded-2xl border border-destructive/20 bg-destructive/5 p-8 text-center space-y-4 max-w-2xl mx-auto my-12">
             <AlertTriangle className="h-10 w-10 text-destructive mx-auto" />
-            <h2 className="text-lg font-bold text-foreground">Analysis Request Failed</h2>
+            <h2 className="text-xl font-bold tracking-tight text-foreground">Analysis Request Failed</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">{error}</p>
 
             {isRateLimit && (
-              <div className="p-3 rounded-lg bg-card border border-border text-xs text-muted-foreground text-left space-y-1">
+              <div className="p-4 rounded-xl glass-card text-xs text-muted-foreground text-left space-y-1.5">
                 <span className="font-semibold text-foreground block">
                   Tip: Rate Limit Exceeded
                 </span>
-                <p>
+                <p className="leading-relaxed">
                   Unauthenticated GitHub requests are capped at 60 requests per hour. You can add a
                   free Personal Access Token to <code>GITHUB_TOKEN</code> in your <code>.env</code> file
                   to raise your limit to 5,000 requests per hour.
@@ -167,12 +177,12 @@ export default function RepositoryDashboardPage() {
           <div className="space-y-6">
             {/* Demo Fallback Warning Banner if Rate Limited */}
             {(data as any).isDemoFallback && (
-              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-500 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div className="glass-card rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-500 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                 <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 shrink-0" />
+                  <AlertTriangle className="h-4 w-4 shrink-0 text-amber-500" />
                   <span>
-                    <strong>Rate Limit Active:</strong> Displaying offline demonstration snapshot. Add a{" "}
-                    <code>GITHUB_TOKEN</code> to your <code>.env</code> file for 5,000 live requests/hour.
+                    <strong className="text-foreground">Rate Limit Active:</strong> Displaying offline demonstration snapshot. Add a{" "}
+                    <code className="text-foreground">GITHUB_TOKEN</code> to your <code className="text-foreground">.env</code> file for 5,000 live requests/hour.
                   </span>
                 </div>
                 {data.rateLimit?.resetAt && (
@@ -190,19 +200,19 @@ export default function RepositoryDashboardPage() {
             <HealthScoreCard data={data} />
 
             {/* Main Tabs Navigation */}
-            <div className="flex border-b border-border/80 gap-6">
+            <div className="flex border-b border-border/80 gap-3 sm:gap-6 overflow-x-auto text-xs sm:text-sm font-semibold pb-px scrollbar-none">
               <button
                 type="button"
                 onClick={() => setActiveTab("issues")}
-                className={`flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 transition-all ${
+                className={`flex items-center gap-1.5 sm:gap-2 pb-3 border-b-2 transition-all whitespace-nowrap cursor-pointer ${
                   activeTab === "issues"
                     ? "border-primary text-primary"
                     : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <FileText className="h-4 w-4" />
-                <span>Issue Explorer & Backlog</span>
-                <span className="px-1.5 py-0.2 rounded-full bg-muted text-[11px] font-mono text-muted-foreground">
+                <FileText className="h-4 w-4 shrink-0" />
+                <span>Issue Explorer</span>
+                <span className="px-1.5 py-0.2 rounded-full bg-muted text-[10px] sm:text-[11px] font-mono text-muted-foreground">
                   {data.issues.filter((i) => !i.isPullRequest).length}
                 </span>
               </button>
@@ -210,27 +220,27 @@ export default function RepositoryDashboardPage() {
               <button
                 type="button"
                 onClick={() => setActiveTab("duplicates")}
-                className={`flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 transition-all ${
+                className={`flex items-center gap-1.5 sm:gap-2 pb-3 border-b-2 transition-all whitespace-nowrap cursor-pointer ${
                   activeTab === "duplicates"
                     ? "border-primary text-primary"
                     : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <CopyCheck className="h-4 w-4" />
-                <span>Duplicate Issue Radar</span>
+                <CopyCheck className="h-4 w-4 shrink-0" />
+                <span>Duplicate Radar</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveTab("analytics")}
-                className={`flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 transition-all ${
+                className={`flex items-center gap-1.5 sm:gap-2 pb-3 border-b-2 transition-all whitespace-nowrap cursor-pointer ${
                   activeTab === "analytics"
                     ? "border-primary text-primary"
                     : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <PieChart className="h-4 w-4" />
-                <span>Repository Analytics</span>
+                <PieChart className="h-4 w-4 shrink-0" />
+                <span>Analytics</span>
               </button>
             </div>
 

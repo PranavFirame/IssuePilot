@@ -208,23 +208,33 @@ function ExploreContent() {
   const totalPages = Math.min(20, Math.max(1, Math.ceil(totalCount / 15)));
 
   return (
-    <div className="min-h-screen flex flex-col bg-background selection:bg-primary/20">
+    <div className="min-h-screen flex flex-col bg-background selection:bg-primary/20 relative overflow-hidden">
+      {/* Ambient background glow orbs */}
+      <div
+        className="hero-orb w-[500px] h-[500px] bg-indigo-600 top-[-100px] left-[-60px]"
+        aria-hidden="true"
+      />
+      <div
+        className="hero-orb w-[400px] h-[400px] bg-violet-600 top-[60px] right-[-40px] opacity-[0.10]"
+        aria-hidden="true"
+      />
+
       <Navbar onOpenSavedReports={() => setIsSavedReportsOpen(true)} />
 
-      <main className="flex-1 container mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+      <main className="flex-1 container mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 space-y-6 relative">
         {/* Header Hero */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
           <div>
-            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary uppercase tracking-wider mb-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border border-primary/30 bg-primary/10 text-primary backdrop-blur-md shadow-sm mb-3">
               <Sparkles className="h-3.5 w-3.5" />
               <span>Open Source Starter Radar</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] text-foreground leading-[1.12]">
               Explore Beginner-Friendly Issues
             </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-2xl leading-relaxed">
-              Curated opportunities tagged <code>good first issue</code>, <code>help wanted</code>, and{" "}
-              <code>documentation</code> across active GitHub repositories with explainable relevance scoring.
+            <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-2xl leading-relaxed">
+              Curated opportunities tagged <code className="text-primary font-mono text-xs">good first issue</code>, <code className="text-primary font-mono text-xs">help wanted</code>, and{" "}
+              <code className="text-primary font-mono text-xs">documentation</code> across active GitHub repositories with explainable relevance scoring.
             </p>
           </div>
 
@@ -260,11 +270,11 @@ function ExploreContent() {
 
         {/* Rate limit warning banner */}
         {isRateLimit && (
-          <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-xs text-destructive flex items-start gap-3">
+          <div className="glass-card rounded-2xl border border-destructive/30 bg-destructive/10 p-4 sm:p-5 text-xs text-destructive flex items-start gap-3">
             <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold">GitHub Search API Rate Limit Reached</p>
-              <p className="text-muted-foreground mt-0.5">
+              <p className="font-semibold text-foreground">GitHub Search API Rate Limit Reached</p>
+              <p className="text-muted-foreground mt-0.5 leading-relaxed">
                 GitHub unauthenticated search requests are temporarily throttled. Reset at{" "}
                 {resetAt ? new Date(resetAt).toLocaleTimeString() : "soon"}. Add a <code>GITHUB_TOKEN</code> to
                 your <code>.env</code> file for 30 requests/minute.
@@ -277,11 +287,11 @@ function ExploreContent() {
         {isLoading ? (
           <div className="space-y-4 animate-pulse">
             {Array.from({ length: 5 }).map((_, idx) => (
-              <div key={idx} className="h-36 rounded-xl bg-card/60 border border-border" />
+              <div key={idx} className="h-36 rounded-2xl bg-card/60 border border-border" />
             ))}
           </div>
         ) : error && !isRateLimit ? (
-          <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-8 text-center space-y-3 max-w-lg mx-auto my-8">
+          <div className="glass-card rounded-2xl border border-destructive/20 bg-destructive/5 p-8 text-center space-y-3 max-w-lg mx-auto my-8">
             <AlertTriangle className="h-8 w-8 text-destructive mx-auto" />
             <h3 className="text-base font-semibold text-foreground">Failed to Load Issues</h3>
             <p className="text-xs text-muted-foreground">{error}</p>
@@ -290,17 +300,25 @@ function ExploreContent() {
             </Button>
           </div>
         ) : issues.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border p-12 text-center bg-card/40 space-y-3">
-            <Compass className="h-10 w-10 text-muted-foreground/30 mx-auto" />
-            <h3 className="text-base font-semibold text-foreground">No matching beginner issues found</h3>
-            <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-              Try removing some search filters, switching language to &quot;All&quot;, or selecting a different
-              difficulty tag.
-            </p>
-            <Button variant="outline" size="sm" onClick={handleResetFilters} className="text-xs">
-              <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
-              Reset All Filters
-            </Button>
+          <div className="glass-card rounded-2xl p-10 sm:p-12 text-center space-y-4">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/30 bg-primary/10 text-primary backdrop-blur-md shadow-sm">
+              <Compass className="h-6 w-6" />
+            </div>
+            <div className="space-y-1.5">
+              <h3 className="text-base sm:text-lg font-bold text-foreground tracking-[-0.02em]">
+                No matching beginner issues found
+              </h3>
+              <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                Try removing some search filters, switching language to &quot;All&quot;, or selecting a different
+                difficulty tag.
+              </p>
+            </div>
+            <div className="pt-2">
+              <Button variant="outline" size="sm" onClick={handleResetFilters} className="text-xs gap-1.5">
+                <RotateCcw className="h-3.5 w-3.5" />
+                <span>Reset All Filters</span>
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="space-y-3.5">
@@ -337,7 +355,7 @@ function ExploreContent() {
 
         {/* Pagination Bar */}
         {!isLoading && totalPages > 1 && (
-          <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-card/60 text-xs text-muted-foreground">
+          <div className="glass-card p-3 rounded-2xl flex items-center justify-between text-xs text-muted-foreground">
             <Button
               variant="outline"
               size="sm"

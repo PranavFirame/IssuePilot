@@ -95,11 +95,11 @@ export function RepoHeader({ data, onRefresh }: RepoHeaderProps) {
   };
 
   return (
-    <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+    <div className="glass-card p-4 sm:p-6">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 sm:gap-6">
         {/* Repository Identification */}
-        <div className="flex items-start gap-4">
-          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
+        <div className="flex items-start gap-3.5 sm:gap-4 min-w-0 w-full lg:w-auto">
+          <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-xl border border-border/70 dark:border-white/10 bg-muted shadow-sm">
             <Image
               src={`https://github.com/${repository.owner}.png`}
               alt={repository.owner}
@@ -110,9 +110,9 @@ export function RepoHeader({ data, onRefresh }: RepoHeaderProps) {
             />
           </div>
 
-          <div>
-            <div className="flex flex-wrap items-center gap-2.5 mb-1.5">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2 mb-1.5">
+              <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-foreground break-all sm:break-normal">
                 <span className="text-muted-foreground font-normal">{repository.owner}/</span>
                 {repository.repo}
               </h1>
@@ -124,7 +124,7 @@ export function RepoHeader({ data, onRefresh }: RepoHeaderProps) {
               )}
 
               {rateLimit && (
-                <span className="text-[11px] text-muted-foreground flex items-center gap-1 font-mono">
+                <span className="text-[10px] sm:text-[11px] text-muted-foreground flex items-center gap-1 font-mono">
                   <Clock className="h-3 w-3" />
                   API Quota: {rateLimit.remaining}/{rateLimit.limit}
                 </span>
@@ -140,7 +140,7 @@ export function RepoHeader({ data, onRefresh }: RepoHeaderProps) {
             )}
 
             {/* Metadata Tags */}
-            <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1 font-medium text-foreground">
                 <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />
                 {formatNumber(repository.stars)}
@@ -159,13 +159,13 @@ export function RepoHeader({ data, onRefresh }: RepoHeaderProps) {
               )}
 
               {repository.license && (
-                <span className="flex items-center gap-1 font-medium">
+                <span className="hidden sm:flex items-center gap-1 font-medium">
                   <Scale className="h-3.5 w-3.5" />
                   {repository.license}
                 </span>
               )}
 
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1 text-[11px] sm:text-xs">
                 <Calendar className="h-3.5 w-3.5" />
                 Updated {formatDate(repository.pushedAt)}
               </span>
@@ -184,45 +184,42 @@ export function RepoHeader({ data, onRefresh }: RepoHeaderProps) {
         </div>
 
         {/* Action Controls */}
-        <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto shrink-0 justify-start lg:justify-end">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExportCsv}
-            className="text-xs h-9 gap-1.5"
-          >
-            <Download className="h-3.5 w-3.5" />
-            <span>Export CSV</span>
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExportMarkdown}
-            className="text-xs h-9 gap-1.5"
-          >
-            <Download className="h-3.5 w-3.5" />
-            <span>Export Markdown</span>
-          </Button>
-
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-2 w-full lg:w-auto shrink-0 justify-start lg:justify-end pt-3 lg:pt-0">
           <Button
             variant={savedSuccess ? "secondary" : "default"}
-            size="sm"
             onClick={handleSaveSnapshot}
             isLoading={isSaving}
-            className="text-xs h-9 gap-1.5 font-medium"
+            className="h-11 sm:h-9 text-sm sm:text-xs px-4 sm:px-3 gap-2 font-semibold col-span-2 sm:col-auto w-full sm:w-auto rounded-xl order-first sm:order-last shadow-sm"
           >
             {savedSuccess ? (
               <>
-                <Check className="h-3.5 w-3.5 text-emerald-500" />
+                <Check className="h-4 w-4 sm:h-3.5 sm:w-3.5 text-emerald-500" />
                 <span>Snapshot Saved</span>
               </>
             ) : (
               <>
-                <Save className="h-3.5 w-3.5" />
+                <Save className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
                 <span>Save Snapshot</span>
               </>
             )}
+          </Button>
+
+          <Button
+            variant="glass"
+            onClick={handleExportCsv}
+            className="h-11 sm:h-9 text-sm sm:text-xs px-3.5 sm:px-3 gap-2 font-medium w-full sm:w-auto rounded-xl"
+          >
+            <Download className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+            <span>Export CSV</span>
+          </Button>
+
+          <Button
+            variant="glass"
+            onClick={handleExportMarkdown}
+            className="h-11 sm:h-9 text-sm sm:text-xs px-3.5 sm:px-3 gap-2 font-medium w-full sm:w-auto rounded-xl"
+          >
+            <Download className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+            <span><span className="inline sm:hidden">Export MD</span><span className="hidden sm:inline">Export Markdown</span></span>
           </Button>
         </div>
       </div>

@@ -124,7 +124,7 @@ export function SavedSearches({ currentFilters, onApply }: SavedSearchesProps) {
           />
 
           {/* Dropdown panel */}
-          <div className="absolute right-0 top-10 z-40 w-72 rounded-xl border border-border bg-card shadow-xl animate-in fade-in zoom-in-95 duration-100">
+          <div className="!absolute right-0 top-10 z-40 w-72 max-w-[calc(100vw-2rem)] p-0 shadow-2xl animate-in fade-in zoom-in-95 duration-100 rounded-xl border border-border bg-white text-foreground shadow-[0_16px_48px_rgba(0,0,0,0.14)]">
             {/* Header */}
             <div className="flex items-center justify-between px-3 py-2.5 border-b border-border/60">
               <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">

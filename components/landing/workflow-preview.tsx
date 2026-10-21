@@ -35,7 +35,7 @@ const STEPS = [
 
 export function WorkflowPreview() {
   return (
-    <section className="py-20 border-t border-border/40 bg-accent/20">
+    <section className="py-20 border-t border-border/60 dark:border-white/10 bg-accent/20 dark:bg-accent/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="mb-12">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-[-0.02em] text-foreground mb-3">
@@ -48,20 +48,20 @@ export function WorkflowPreview() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
           {/* Connecting line on desktop */}
-          <div className="hidden md:block absolute top-7 left-[calc(33.33%+1rem)] right-[calc(33.33%+1rem)] h-px bg-border/60" aria-hidden="true" />
+          <div className="hidden md:block absolute top-7 left-[calc(33.33%+1rem)] right-[calc(33.33%+1rem)] h-px bg-border/60 dark:bg-white/10" aria-hidden="true" />
 
           {STEPS.map((step) => {
             const Icon = step.icon;
             return (
               <div
                 key={step.number}
-                className="relative flex flex-col gap-5 p-6 rounded-2xl border border-border/60 bg-background hover:border-border transition-colors"
+                className="glass-card-interactive flex flex-col gap-5 p-6"
               >
                 <div className="flex items-center gap-3">
-                  <div className={`flex h-8 w-8 items-center justify-center rounded-lg border ${step.borderColor} ${step.bgColor} ${step.color} text-xs font-bold font-mono shrink-0`}>
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-lg border ${step.borderColor} ${step.bgColor} ${step.color} text-xs font-bold font-mono shrink-0 shadow-sm backdrop-blur-md`}>
                     {step.number}
                   </div>
-                  <Icon className={`h-5 w-5 ${step.color} opacity-60`} />
+                  <Icon className={`h-5 w-5 ${step.color} opacity-80`} />
                 </div>
                 <div>
                   <h3 className="text-[15px] font-semibold text-foreground mb-2 tracking-[-0.01em]">

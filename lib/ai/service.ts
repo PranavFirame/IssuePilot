@@ -97,8 +97,9 @@ ${safeBody}
 
   try {
     if (config.provider === "gemini") {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${config.apiKey}`,
+      const geminiModel = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+      let response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${config.apiKey}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -119,6 +120,39 @@ ${safeBody}
           }),
         }
       );
+
+      let effectiveModel = geminiModel;
+
+      // Fallback if specific model returned 404
+      if (response.status === 404 && geminiModel !== "gemini-2.5-flash") {
+        const fallbackModel = "gemini-2.5-flash";
+        const fallbackRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${fallbackModel}:generateContent?key=${config.apiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [
+                {
+                  role: "user",
+                  parts: [
+                    { text: SYSTEM_PROMPT },
+                    { text: userPrompt },
+                  ],
+                },
+              ],
+              generationConfig: {
+                responseMimeType: "application/json",
+                temperature: 0.2,
+              },
+            }),
+          }
+        );
+        if (fallbackRes.ok) {
+          response = fallbackRes;
+          effectiveModel = fallbackModel;
+        }
+      }
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -155,7 +189,7 @@ ${safeBody}
         result: {
           ...validated.data,
           isAiGenerated: true,
-          modelUsed: "gemini-1.5-flash",
+          modelUsed: effectiveModel,
         },
       };
     } else if (config.provider === "openai") {

@@ -37,9 +37,9 @@ const SECURITY_ITEMS = [
 
 export function SecuritySection() {
   return (
-    <section className="py-20 border-t border-border/40">
+    <section className="py-20 border-t border-border/60 dark:border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="rounded-2xl border border-border/60 bg-card/40 p-8 sm:p-12">
+        <div className="glass-card p-8 sm:p-12">
           <div className="mb-10">
             <p className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-emerald-400" />
@@ -57,8 +57,8 @@ export function SecuritySection() {
             {SECURITY_ITEMS.map((item) => {
               const Icon = item.icon;
               return (
-                <div key={item.title} className="space-y-3">
-                  <div className={`inline-flex p-2 rounded-lg ${item.bg} ${item.color}`}>
+                <div key={item.title} className="p-4 rounded-xl border border-border/60 dark:border-white/5 bg-background/50 dark:bg-white/[0.02] backdrop-blur-md space-y-3 hover:border-primary/40 transition-colors">
+                  <div className={`inline-flex p-2.5 rounded-lg border border-border/50 dark:border-white/10 backdrop-blur-md ${item.bg} ${item.color}`}>
                     <Icon className="h-4 w-4" />
                   </div>
                   <div>

@@ -139,10 +139,10 @@ export function PreferencesEditor() {
               key={lvl}
               type="button"
               onClick={() => setPreferences((p) => ({ ...p, experienceLevel: lvl }))}
-              className={`p-3 rounded-xl border text-left transition-all ${
+              className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer backdrop-blur-md ${
                 preferences.experienceLevel === lvl
-                  ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/30"
-                  : "border-border/80 bg-card/40 text-muted-foreground hover:bg-accent/40 hover:text-foreground"
+                  ? "border-primary/60 bg-primary/15 text-foreground ring-1 ring-primary/40 shadow-sm"
+                  : "border-border/80 dark:border-white/10 bg-card/60 dark:bg-card/40 text-muted-foreground hover:bg-accent/50 dark:hover:bg-white/5 hover:text-foreground"
               }`}
             >
               <div className="flex items-center justify-between mb-1">

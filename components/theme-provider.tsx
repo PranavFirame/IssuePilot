@@ -2,56 +2,41 @@
 
 import * as React from "react";
 
-type Theme = "dark" | "light" | "system";
+type Theme = "light";
 
 interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  actualTheme: "dark" | "light";
+  actualTheme: "light";
 }
 
-const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = React.createContext<ThemeContextType>({
+  theme: "light",
+  setTheme: () => {},
+  actualTheme: "light",
+});
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = React.useState<Theme>("dark");
-  const [actualTheme, setActualTheme] = React.useState<"dark" | "light">("dark");
-
   React.useEffect(() => {
-    const saved = localStorage.getItem("issuepilot-theme") as Theme | null;
-    if (saved) {
-      setTheme(saved);
-    } else {
-      setTheme("dark"); // Default to dark for developer dashboard
+    try {
+      localStorage.setItem("issuepilot-theme", "light");
+    } catch {
+      // Ignore storage errors in restricted contexts
     }
+
+    const root = document.documentElement;
+    root.classList.remove("dark");
+    root.classList.add("light");
+    root.style.colorScheme = "light";
   }, []);
 
-  React.useEffect(() => {
-    const root = document.documentElement;
-    root.classList.remove("light", "dark");
-
-    let resolved: "dark" | "light" = "dark";
-    if (theme === "system") {
-      resolved = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    } else {
-      resolved = theme;
-    }
-
-    setActualTheme(resolved);
-    root.classList.add(resolved);
-    localStorage.setItem("issuepilot-theme", theme);
-  }, [theme]);
-
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, actualTheme }}>
+    <ThemeContext.Provider value={{ theme: "light", setTheme: () => {}, actualTheme: "light" }}>
       {children}
     </ThemeContext.Provider>
   );
 }
 
 export function useTheme() {
-  const context = React.useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
-  return context;
+  return React.useContext(ThemeContext);
 }

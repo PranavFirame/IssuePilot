@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, ArrowRight, Check, Eye, EyeOff, Lock, Mail, User, ShieldCheck } from "lucide-react";
 import { AuthCard } from "@/components/auth/auth-card";
 import { GithubButton } from "@/components/auth/github-button";
+import { GoogleButton } from "@/components/auth/google-button";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth/auth-provider";
 
@@ -77,8 +78,11 @@ function SignUpContent() {
       }
     >
       <div className="space-y-5">
-        {/* GitHub OAuth Button */}
-        <GithubButton returnUrl={returnUrl} />
+        {/* OAuth Buttons */}
+        <div className="space-y-2.5">
+          <GithubButton returnUrl={returnUrl} />
+          <GoogleButton returnUrl={returnUrl} />
+        </div>
 
         {/* Divider */}
         <div className="relative flex items-center justify-center">

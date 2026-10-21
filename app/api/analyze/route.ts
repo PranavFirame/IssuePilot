@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
     return session.attachCookie(res);
   } catch (error: unknown) {
     if (error instanceof GitHubApiError) {
-      if (error.isRateLimit && parsedOwner && parsedRepo) {
+      if ((error.isRateLimit || error.statusCode === 504) && parsedOwner && parsedRepo) {
         // Provide immediate functional fallback so maintainers can test the UI without blocking
         const fallback = getFallbackRepoPayload(parsedOwner, parsedRepo);
         const session = await resolveSessionOrGuest(req);

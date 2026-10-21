@@ -13,6 +13,36 @@ export interface RecommendationMatch {
   isHeuristic: boolean;
 }
 
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Safely tests if a keyword or language term appears in text as a distinct word or symbol.
+ * Handles special language names such as "C++", "C#", ".NET", etc. without throwing regex SyntaxErrors
+ * and avoiding false positives (e.g. "Java" matching inside "JavaScript").
+ */
+export function matchesKeyword(text: string, term: string): boolean {
+  if (!text || !term) return false;
+  const lowerText = text.toLowerCase();
+  const lowerTerm = term.toLowerCase().trim();
+  if (!lowerTerm) return false;
+
+  // Direct substring check first
+  if (!lowerText.includes(lowerTerm)) return false;
+
+  const escaped = escapeRegex(lowerTerm);
+  const prefix = /^\w/.test(lowerTerm) ? "(?:^|[^a-zA-Z0-9_])" : "(?:^|\\s)";
+  const suffix = /\w$/.test(lowerTerm) ? "(?:$|[^a-zA-Z0-9_])" : "(?:$|\\s|[^a-zA-Z0-9_])";
+
+  try {
+    const rx = new RegExp(`${prefix}${escaped}${suffix}`, "i");
+    return rx.test(text);
+  } catch {
+    return lowerText.includes(lowerTerm);
+  }
+}
+
 export function calculateRecommendationScore(
   issue: BeginnerIssue,
   prefs: UserPreferencesData
@@ -29,11 +59,11 @@ export function calculateRecommendationScore(
 
   // 1. Language Match (+35 max)
   const matchesLanguage = userLangs.some((lang) => {
+    if (!lang) return false;
     if (lang === issueLang) return true;
-    const wordRegex = new RegExp(`\\b${lang}\\b`, "i");
     return (
-      wordRegex.test(issue.title) ||
-      issue.labels.some((l) => wordRegex.test(l.name))
+      matchesKeyword(issue.title, lang) ||
+      issue.labels.some((l) => matchesKeyword(l.name, lang))
     );
   });
 
@@ -83,8 +113,7 @@ export function calculateRecommendationScore(
   const matchedTopics: string[] = [];
   for (const topic of userTopics) {
     if (!topic || topic.length < 2) continue;
-    const topicRegex = new RegExp(`\\b${topic}\\b`, "i");
-    if (topicRegex.test(issueText)) {
+    if (matchesKeyword(issueText, topic)) {
       matchedTopics.push(topic);
     }
   }

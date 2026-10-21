@@ -70,17 +70,19 @@ export function SavedReportsModal({ isOpen, onClose }: SavedReportsModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl rounded-xl border border-border bg-card shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-background/60 dark:bg-background/70 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="glass-card relative w-[calc(100vw-1.5rem)] sm:w-full sm:max-w-2xl shadow-2xl flex flex-col max-h-[90dvh] sm:max-h-[85vh]">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <div className="flex items-center gap-2 font-semibold text-base text-foreground">
-            <History className="h-5 w-5 text-primary" />
-            <span>Saved Repository Snapshots</span>
+        <div className="flex items-center justify-between border-b border-border/60 dark:border-white/10 px-4 sm:px-6 py-3.5 sm:py-4 bg-muted/30 dark:bg-white/[0.02]">
+          <div className="flex items-center gap-2.5 font-semibold text-base text-foreground">
+            <div className="p-1.5 rounded-lg border border-primary/20 bg-primary/10 text-primary backdrop-blur-md shrink-0">
+              <History className="h-4 w-4" />
+            </div>
+            <span className="text-sm sm:text-base truncate">Saved Repository Snapshots</span>
           </div>
           <button
             onClick={onClose}
-            className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            className="rounded-lg p-2 text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors cursor-pointer shrink-0 min-h-[36px] min-w-[36px] flex items-center justify-center"
             aria-label="Close modal"
           >
             <X className="h-4 w-4" />
@@ -88,7 +90,7 @@ export function SavedReportsModal({ isOpen, onClose }: SavedReportsModalProps) {
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto p-6 space-y-3 flex-1">
+        <div className="overflow-y-auto p-4 sm:p-6 space-y-3 flex-1">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-3">
               <div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -112,10 +114,10 @@ export function SavedReportsModal({ isOpen, onClose }: SavedReportsModalProps) {
             reports.map((report) => (
               <div
                 key={report.id}
-                className="flex items-center justify-between gap-4 p-4 rounded-lg border border-border/80 bg-muted/20 hover:bg-muted/40 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-lg border border-border/80 bg-muted/20 hover:bg-muted/40 transition-colors"
               >
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
                     <Link
                       href={`/repo/${report.owner}/${report.repo}`}
                       onClick={onClose}
@@ -132,12 +134,12 @@ export function SavedReportsModal({ isOpen, onClose }: SavedReportsModalProps) {
                   </div>
 
                   {report.description && (
-                    <p className="text-xs text-muted-foreground truncate mb-2">
+                    <p className="text-xs text-muted-foreground line-clamp-2 sm:truncate mb-2">
                       {report.description}
                     </p>
                   )}
 
-                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                  <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Star className="h-3 w-3 text-amber-500" />
                       {formatNumber(report.stars)}
@@ -153,20 +155,20 @@ export function SavedReportsModal({ isOpen, onClose }: SavedReportsModalProps) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/40 w-full sm:w-auto">
                   <Link
                     href={`/repo/${report.owner}/${report.repo}`}
                     onClick={onClose}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                    className="inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors flex-1 sm:flex-initial min-h-[32px]"
                   >
-                    <span>View</span>
+                    <span>View Analysis</span>
                     <ExternalLink className="h-3 w-3" />
                   </Link>
 
                   <button
                     onClick={() => handleDelete(report.id)}
                     disabled={deletingId === report.id}
-                    className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
+                    className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50 min-h-[32px] min-w-[32px] flex items-center justify-center"
                     aria-label="Delete snapshot"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -178,8 +180,8 @@ export function SavedReportsModal({ isOpen, onClose }: SavedReportsModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="border-t border-border px-6 py-3 bg-muted/20 flex justify-end">
-          <Button variant="outline" size="sm" onClick={onClose} className="text-xs">
+        <div className="border-t border-border px-4 sm:px-6 py-3 bg-muted/20 flex justify-end">
+          <Button variant="outline" size="sm" onClick={onClose} className="text-xs h-8 px-4">
             Close
           </Button>
         </div>

@@ -33,7 +33,7 @@ export function MatchReasonBadge({ match, className }: MatchReasonBadgeProps) {
 
       {/* Popover Breakdown */}
       {showPopover && (
-        <div className="absolute right-0 top-full mt-1.5 z-30 w-72 rounded-lg border border-border bg-card p-3 shadow-xl text-xs space-y-2 animate-in fade-in zoom-in-95">
+        <div className="!absolute right-0 top-full mt-1.5 z-30 w-72 max-w-[calc(100vw-2rem)] p-3 shadow-2xl text-xs space-y-2 animate-in fade-in zoom-in-95 rounded-xl border border-border bg-white text-foreground shadow-[0_16px_48px_rgba(0,0,0,0.14)]">
           <div className="flex items-center justify-between pb-1.5 border-b border-border/80">
             <span className="font-semibold text-foreground flex items-center gap-1.5">
               <Sparkles className="h-3.5 w-3.5 text-primary" />

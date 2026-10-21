@@ -215,12 +215,22 @@ function WorkspaceContent() {
   }, [trackedIssues, activeTab]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background selection:bg-primary/20">
+    <div className="min-h-screen flex flex-col bg-background selection:bg-primary/20 relative overflow-hidden">
+      {/* Ambient background glow orbs */}
+      <div
+        className="hero-orb w-[600px] h-[600px] bg-indigo-600 top-[-100px] left-[-80px]"
+        aria-hidden="true"
+      />
+      <div
+        className="hero-orb w-[400px] h-[400px] bg-violet-600 top-[80px] right-[-50px] opacity-[0.10]"
+        aria-hidden="true"
+      />
+
       <Navbar onOpenSavedReports={() => setIsSavedReportsOpen(true)} />
 
-      <main className="flex-1 container mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+      <main className="flex-1 container mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 space-y-6 relative">
         {/* Contributor Profile Header Banner */}
-        <div className="rounded-2xl border border-border/80 bg-card/60 backdrop-blur-xl p-5 sm:p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="glass-card p-5 sm:p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             {user?.avatarUrl ? (
               <div className="relative h-12 w-12 rounded-xl overflow-hidden border border-border bg-card shrink-0">
@@ -275,25 +285,25 @@ function WorkspaceContent() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-stretch sm:self-auto justify-end">
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
             <button
               type="button"
               onClick={() => setIsOnboardingOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-primary/40 bg-primary/10 hover:bg-primary/20 text-xs font-semibold text-primary transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/40 bg-primary/10 hover:bg-primary/20 text-xs font-semibold text-primary transition-colors flex-1 sm:flex-initial min-h-[36px]"
             >
               <Sliders className="h-3.5 w-3.5" />
               <span>Calibrate Stack</span>
             </button>
             <Link
               href="/profile"
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border/80 bg-background/50 hover:bg-accent text-xs font-semibold text-foreground transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-border/80 bg-background/50 hover:bg-accent text-xs font-semibold text-foreground transition-colors flex-1 sm:flex-initial min-h-[36px]"
             >
               <User className="h-3.5 w-3.5 text-muted-foreground" />
               <span>Profile</span>
             </Link>
             <Link
               href="/explore"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors shadow-sm"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors shadow-sm w-full sm:w-auto min-h-[36px]"
             >
               <Compass className="h-3.5 w-3.5" />
               <span>Explore Starter Issues</span>
@@ -303,7 +313,7 @@ function WorkspaceContent() {
 
         {/* Unauthenticated Guest Notification */}
         {!isAuthenticated && (
-          <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+          <div className="glass-card rounded-2xl border border-primary/30 bg-primary/10 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-2.5 text-muted-foreground">
               <Sparkles className="h-4 w-4 text-primary shrink-0" />
               <span>
@@ -321,7 +331,7 @@ function WorkspaceContent() {
         )}
 
         {/* Main Workspace View Switcher */}
-        <div className="flex border-b border-border/80 gap-2 overflow-x-auto text-xs font-semibold">
+        <div className="flex border-b border-border/80 gap-1 sm:gap-2 overflow-x-auto text-xs font-semibold whitespace-nowrap">
           <button
             type="button"
             onClick={() => setMainView("tracked")}
@@ -403,7 +413,7 @@ function WorkspaceContent() {
         {mainView === "tracked" && (
           <div className="space-y-4">
             {/* Status Filter Sub-Tabs */}
-            <div className="flex border-b border-border/40 gap-6 overflow-x-auto text-xs">
+            <div className="flex border-b border-border/40 gap-4 sm:gap-6 overflow-x-auto text-xs whitespace-nowrap">
               {(
                 [
                   { key: "all", label: "All Statuses", count: trackedIssues.length },
@@ -449,19 +459,23 @@ function WorkspaceContent() {
             {isLoading ? (
               <div className="space-y-3 animate-pulse">
                 {Array.from({ length: 3 }).map((_, idx) => (
-                  <div key={idx} className="h-28 rounded-xl bg-card/60 border border-border" />
+                  <div key={idx} className="h-28 rounded-2xl bg-card/60 border border-border" />
                 ))}
               </div>
             ) : filteredIssues.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-border/80 p-12 text-center bg-card/40 space-y-3">
-                <Bookmark className="h-10 w-10 text-muted-foreground/30 mx-auto" />
-                <h3 className="text-base font-semibold text-foreground">
-                  No issues in &ldquo;{activeTab.replace("_", " ")}&rdquo;
-                </h3>
-                <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
-                  Discover beginner-friendly starter tickets on the Explore page and track them to manage your progress.
-                </p>
-                <div className="pt-2 flex items-center justify-center gap-2">
+              <div className="glass-card rounded-2xl p-10 sm:p-12 text-center space-y-4">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/30 bg-primary/10 text-primary backdrop-blur-md shadow-sm">
+                  <Bookmark className="h-6 w-6" />
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="text-base sm:text-lg font-bold text-foreground tracking-[-0.02em]">
+                    No issues in &ldquo;{activeTab.replace("_", " ")}&rdquo;
+                  </h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                    Discover beginner-friendly starter tickets on the Explore page and track them to manage your progress.
+                  </p>
+                </div>
+                <div className="pt-2 flex items-center justify-center gap-2.5">
                   <Button
                     variant="outline"
                     size="sm"
@@ -510,7 +524,7 @@ function WorkspaceContent() {
         {/* View 3: Analyzed Repositories */}
         {mainView === "analyzed" && (
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl border border-border/80 bg-card/40 text-xs">
+            <div className="glass-card p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
               <div>
                 <p className="font-semibold text-foreground">Saved Repository Snapshots &amp; Analyses</p>
                 <p className="text-muted-foreground mt-0.5">
@@ -526,43 +540,49 @@ function WorkspaceContent() {
                 }}
                 className="flex items-center gap-2 w-full sm:w-auto"
               >
-                <div className="relative flex-1 sm:w-60">
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
+                <div className="relative flex-1 sm:w-64">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
                   <input
                     type="text"
                     value={quickRepoInput}
                     onChange={(e) => setQuickRepoInput(e.target.value)}
                     placeholder="Analyze repo (owner/repo)..."
-                    className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-border/80 dark:border-white/10 bg-background/80 dark:bg-card/80 backdrop-blur-md text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
-                <Button type="submit" size="sm" className="text-xs h-8 shrink-0">
+                <Button type="submit" size="sm" className="text-xs h-9 px-4 shrink-0 rounded-xl">
                   Analyze
                 </Button>
               </form>
             </div>
 
             {savedReports.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-border/80 p-12 text-center bg-card/40 space-y-3">
-                <BarChart3 className="h-10 w-10 text-muted-foreground/30 mx-auto" />
-                <h3 className="text-base font-semibold text-foreground">No analyzed repositories yet</h3>
-                <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
-                  Enter any public GitHub repository (e.g. <code>facebook/react</code> or <code>vercel/next.js</code>) to evaluate health scores, detect duplicate tickets, and save intelligence reports.
-                </p>
-                <Button
-                  size="sm"
-                  onClick={() => router.push("/")}
-                  className="text-xs mt-2"
-                >
-                  Analyze a Repository
-                </Button>
+              <div className="glass-card rounded-2xl p-10 sm:p-12 text-center space-y-4">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-400 backdrop-blur-md shadow-sm">
+                  <BarChart3 className="h-6 w-6" />
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="text-base sm:text-lg font-bold text-foreground tracking-[-0.02em]">No analyzed repositories yet</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                    Enter any public GitHub repository (e.g. <code>facebook/react</code> or <code>vercel/next.js</code>) to evaluate health scores, detect duplicate tickets, and save intelligence reports.
+                  </p>
+                </div>
+                <div className="pt-2">
+                  <Button
+                    size="sm"
+                    onClick={() => router.push("/")}
+                    className="text-xs"
+                  >
+                    Analyze a Repository
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {savedReports.map((report) => (
                   <div
                     key={report.id}
-                    className="flex flex-col justify-between p-5 rounded-xl border border-border/80 bg-card/60 hover:border-primary/40 transition-colors shadow-sm space-y-4"
+                    className="glass-card-interactive flex flex-col justify-between p-5 space-y-4"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-1.5">
@@ -636,27 +656,33 @@ function WorkspaceContent() {
         {mainView === "recent" && (
           <div className="space-y-4">
             {recentlyViewed.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-border/80 p-12 text-center bg-card/40 space-y-3">
-                <History className="h-10 w-10 text-muted-foreground/30 mx-auto" />
-                <h3 className="text-base font-semibold text-foreground">No recently viewed issues</h3>
-                <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
-                  As you inspect beginner issues and repositories, your viewing history will appear here for fast access.
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => router.push("/explore")}
-                  className="text-xs mt-2"
-                >
-                  Explore Beginner Issues
-                </Button>
+              <div className="glass-card rounded-2xl p-10 sm:p-12 text-center space-y-4">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-border/80 bg-muted/40 text-muted-foreground backdrop-blur-md shadow-sm">
+                  <History className="h-6 w-6" />
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="text-base sm:text-lg font-bold text-foreground tracking-[-0.02em]">No recently viewed issues</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                    As you inspect beginner issues and repositories, your viewing history will appear here for fast access.
+                  </p>
+                </div>
+                <div className="pt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => router.push("/explore")}
+                    className="text-xs"
+                  >
+                    Explore Beginner Issues
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="space-y-2.5">
                 {recentlyViewed.map((item) => (
                   <div
                     key={item.id}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 rounded-xl border border-border/80 bg-card/60 hover:border-primary/40 transition-colors"
+                    className="glass-card-interactive flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5"
                   >
                     <div>
                       <div className="flex items-center gap-2">
@@ -706,7 +732,7 @@ function WorkspaceContent() {
               monthlyGoal={preferences.monthlyGoal || 3}
             />
 
-            <div className="p-4 sm:p-5 rounded-xl border border-border/80 bg-card/40 flex items-center justify-between gap-4">
+            <div className="glass-card p-4 sm:p-5 flex items-center justify-between gap-4">
               <div>
                 <h4 className="text-sm font-semibold text-foreground">Adjust Monthly Contribution Target</h4>
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -715,7 +741,7 @@ function WorkspaceContent() {
               </div>
               <Link
                 href="/profile"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background hover:bg-accent text-xs font-semibold text-foreground transition-colors shrink-0"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/80 dark:border-white/10 bg-background/60 hover:bg-accent text-xs font-semibold text-foreground transition-colors shrink-0"
               >
                 <Sliders className="h-3.5 w-3.5 text-primary" />
                 <span>Adjust Target</span>

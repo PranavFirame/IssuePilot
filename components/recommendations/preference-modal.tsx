@@ -89,17 +89,17 @@ export function PreferenceModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg rounded-xl border border-border bg-card shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-background/60 dark:bg-background/70 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="glass-card relative w-[calc(100vw-1.5rem)] sm:w-full sm:max-w-lg shadow-2xl flex flex-col max-h-[90dvh] sm:max-h-[85vh]">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border px-6 py-4 bg-muted/20">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
+        <div className="flex items-center justify-between border-b border-border/60 dark:border-white/10 px-4 sm:px-6 py-3.5 sm:py-4 bg-muted/30 dark:bg-white/[0.02]">
+          <div className="flex items-center gap-2 min-w-0 pr-2">
+            <div className="p-1.5 rounded-lg border border-primary/20 bg-primary/10 text-primary backdrop-blur-md shrink-0">
               <Sparkles className="h-4 w-4" />
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-foreground">Recommendation Preferences</h3>
-              <p className="text-[11px] text-muted-foreground">
+            <div className="min-w-0">
+              <h3 className="text-sm font-bold text-foreground truncate">Recommendation Preferences</h3>
+              <p className="text-[11px] text-muted-foreground truncate">
                 Tune your skill profile to power transparent relevance scoring
               </p>
             </div>
@@ -107,14 +107,15 @@ export function PreferenceModal({
 
           <button
             onClick={onClose}
-            className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            className="rounded-lg p-2 text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors cursor-pointer shrink-0 min-h-[36px] min-w-[36px] flex items-center justify-center"
+            aria-label="Close"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto p-6 space-y-5 flex-1 text-xs sm:text-sm">
+        <div className="overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5 flex-1 text-xs sm:text-sm">
           {/* Languages */}
           <div className="space-y-2">
             <span className="font-semibold text-foreground block">
@@ -207,16 +208,16 @@ export function PreferenceModal({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-border px-6 py-3 bg-muted/20 flex items-center justify-between">
-          <span className="text-[11px] text-muted-foreground">
+        <div className="border-t border-border px-4 sm:px-6 py-3 bg-muted/20 flex flex-col-reverse sm:flex-row gap-2.5 sm:gap-0 items-stretch sm:items-center justify-between">
+          <span className="text-[11px] text-muted-foreground text-center sm:text-left">
             Saved to local workspace profile
           </span>
 
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={onClose} className="text-xs">
+          <div className="flex items-center gap-2 justify-end">
+            <Button variant="outline" size="sm" onClick={onClose} className="text-xs h-8 px-3 flex-1 sm:flex-initial">
               Cancel
             </Button>
-            <Button size="sm" onClick={handleSave} className="text-xs gap-1.5">
+            <Button size="sm" onClick={handleSave} className="text-xs h-8 gap-1.5 px-3 flex-1 sm:flex-initial">
               {isSavedNotice ? (
                 <>
                   <Check className="h-3.5 w-3.5 text-emerald-400" />

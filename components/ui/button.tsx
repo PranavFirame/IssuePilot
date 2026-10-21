@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "secondary" | "outline" | "ghost" | "destructive" | "subtle";
+  variant?: "default" | "secondary" | "outline" | "ghost" | "destructive" | "subtle" | "glass";
   size?: "default" | "sm" | "lg" | "icon";
   isLoading?: boolean;
 }
@@ -14,7 +14,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         className={cn(
-          "inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 select-none",
+          "inline-flex items-center justify-center font-medium cursor-pointer transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 select-none",
           {
             "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm active:scale-[0.98]":
               variant === "default",
@@ -24,6 +24,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             "bg-destructive text-destructive-foreground hover:bg-destructive/90":
               variant === "destructive",
             "bg-muted/60 text-foreground hover:bg-muted": variant === "subtle",
+            "border border-border/80 dark:border-white/10 bg-card/75 dark:bg-card/50 hover:bg-card/95 dark:hover:bg-card/70 text-foreground backdrop-blur-md shadow-sm hover:border-primary/40 active:scale-[0.98]":
+              variant === "glass",
             "h-9 px-4 py-2 text-sm rounded-md": size === "default",
             "h-8 px-3 text-xs rounded": size === "sm",
             "h-11 px-6 text-base rounded-md font-semibold": size === "lg",

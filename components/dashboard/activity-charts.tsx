@@ -16,11 +16,11 @@ export function ActivityCharts({ data }: ActivityChartsProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Label Distribution */}
-      <Card className="lg:col-span-2 bg-card border-border">
+      <Card className="lg:col-span-2">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-bold flex items-center gap-2">
             <Tag className="h-4 w-4 text-primary" />
-            <span>Top Issue Labels & Taxonomy</span>
+            <span>Top Issue Labels &amp; Taxonomy</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -45,7 +45,7 @@ export function ActivityCharts({ data }: ActivityChartsProps) {
                       {label.count} ({pct}%)
                     </span>
                   </div>
-                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-muted/60 rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all"
                       style={{
@@ -62,7 +62,7 @@ export function ActivityCharts({ data }: ActivityChartsProps) {
       </Card>
 
       {/* Top Contributors */}
-      <Card className="lg:col-span-1 bg-card border-border">
+      <Card className="lg:col-span-1">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-bold flex items-center gap-2">
             <Users className="h-4 w-4 text-emerald-500" />
@@ -78,7 +78,7 @@ export function ActivityCharts({ data }: ActivityChartsProps) {
             repository.contributors.slice(0, 6).map((c) => (
               <div
                 key={c.login}
-                className="flex items-center justify-between gap-3 p-2 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors"
+                className="flex items-center justify-between gap-3 p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Image
@@ -110,7 +110,7 @@ export function ActivityCharts({ data }: ActivityChartsProps) {
 
       {/* Activity Timeline */}
       {activityTimeline.length > 0 && (
-        <Card className="lg:col-span-3 bg-card border-border">
+        <Card className="lg:col-span-3">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold flex items-center gap-2">
               <Calendar className="h-4 w-4 text-cyan-500" />
@@ -122,7 +122,7 @@ export function ActivityCharts({ data }: ActivityChartsProps) {
               {activityTimeline.map((item) => (
                 <div
                   key={item.date}
-                  className="p-2.5 rounded-lg border border-border bg-muted/20 flex flex-col justify-between text-xs"
+                  className="p-2.5 rounded-lg border border-border/80 bg-muted/20 flex flex-col justify-between text-xs"
                 >
                   <span className="text-[11px] font-mono text-muted-foreground mb-1">
                     {item.date.slice(5)}

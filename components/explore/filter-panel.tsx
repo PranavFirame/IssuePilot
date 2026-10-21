@@ -89,104 +89,110 @@ export function FilterPanel({
   const isFiltered = query || (language && language !== "all") || (difficulty && difficulty !== "all") || sort !== "updated";
 
   return (
-    <div className="rounded-xl border border-border bg-card p-4 space-y-3 shadow-sm">
+    <div className="glass-card p-4 sm:p-5 space-y-3 shadow-sm relative">
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
         {/* Search input */}
         <form onSubmit={handleSearchSubmit} className="relative flex-1">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 pointer-events-none" />
           <input
             type="text"
             value={searchInput}
             onChange={handleSearchChange}
             placeholder="Search beginner issues (e.g., react, cli, parser, docs)..."
-            className="w-full rounded-md border border-border bg-background/60 pl-9 pr-20 py-1.5 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+            className="w-full rounded-xl border border-border/80 dark:border-white/10 bg-background/70 dark:bg-card/60 backdrop-blur-md pl-10 pr-20 py-2 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             aria-label="Search beginner issues"
           />
           {searchInput !== query && (
             <button
               type="submit"
-              className="absolute right-2 top-1.5 px-2 py-0.5 rounded bg-primary text-primary-foreground text-xs font-semibold"
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 rounded-lg bg-primary text-primary-foreground text-xs font-semibold cursor-pointer shadow-sm hover:bg-primary/90 transition-colors"
             >
               Search
             </button>
           )}
         </form>
 
-        {/* Dropdown Filters */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Language Selector */}
-          <select
-            value={language || "all"}
-            onChange={(e) => onFilterChange({ language: e.target.value })}
-            className="h-8 rounded-md border border-border bg-background px-2.5 text-xs text-foreground focus:border-primary focus:outline-none"
-            aria-label="Filter by programming language"
-          >
-            {LANGUAGES.map((l) => (
-              <option key={l} value={l.toLowerCase() === "all" ? "all" : l}>
-                Language: {l}
-              </option>
-            ))}
-          </select>
-
-          {/* Difficulty Selector */}
-          <select
-            value={difficulty || "all"}
-            onChange={(e) => onFilterChange({ difficulty: e.target.value })}
-            className="h-8 rounded-md border border-border bg-background px-2.5 text-xs text-foreground focus:border-primary focus:outline-none"
-            aria-label="Filter by difficulty"
-          >
-            {DIFFICULTIES.map((d) => (
-              <option key={d.value} value={d.value}>
-                {d.label}
-              </option>
-            ))}
-          </select>
-
-          {/* Sort Selector */}
-          <select
-            value={sort || "updated"}
-            onChange={(e) => onFilterChange({ sort: e.target.value })}
-            className="h-8 rounded-md border border-border bg-background px-2.5 text-xs text-foreground focus:border-primary focus:outline-none"
-            aria-label="Sort order"
-          >
-            <option value="updated">Recently Updated</option>
-            <option value="comments">Most Comments</option>
-            <option value="created">Newest Created</option>
-          </select>
-
-          {/* Reset Filters */}
-          {isFiltered && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onResetFilters}
-              className="h-8 text-xs text-muted-foreground hover:text-foreground gap-1"
+        {/* Dropdown Filters and Action Controls */}
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2">
+          {/* Select Controls Grid for Mobile */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:flex lg:items-center gap-2 w-full lg:w-auto">
+            {/* Language Selector */}
+            <select
+              value={language || "all"}
+              onChange={(e) => onFilterChange({ language: e.target.value })}
+              className="h-9 sm:h-9 rounded-xl border border-border/80 dark:border-white/10 bg-background/80 dark:bg-card/80 backdrop-blur-md px-3 text-xs text-foreground focus:border-primary/60 focus:outline-none cursor-pointer w-full lg:w-auto"
+              aria-label="Filter by programming language"
             >
-              <RotateCcw className="h-3 w-3" />
-              <span>Reset</span>
-            </Button>
-          )}
+              {LANGUAGES.map((l) => (
+                <option key={l} value={l.toLowerCase() === "all" ? "all" : l}>
+                  Language: {l}
+                </option>
+              ))}
+            </select>
 
-          {/* Saved Searches Dropdown */}
-          {onApplySavedSearch && (
-            <SavedSearches
-              currentFilters={{ query, language, difficulty, sort }}
-              onApply={onApplySavedSearch}
-            />
-          )}
-
-          {/* Preferences Button */}
-          {onOpenPreferences && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onOpenPreferences}
-              className="h-8 text-xs gap-1.5 border-primary/30 text-primary hover:bg-primary/5"
+            {/* Difficulty Selector */}
+            <select
+              value={difficulty || "all"}
+              onChange={(e) => onFilterChange({ difficulty: e.target.value })}
+              className="h-9 sm:h-9 rounded-xl border border-border/80 dark:border-white/10 bg-background/80 dark:bg-card/80 backdrop-blur-md px-3 text-xs text-foreground focus:border-primary/60 focus:outline-none cursor-pointer w-full lg:w-auto"
+              aria-label="Filter by difficulty"
             >
-              <Sparkles className="h-3 w-3" />
-              <span>My Preferences</span>
-            </Button>
-          )}
+              {DIFFICULTIES.map((d) => (
+                <option key={d.value} value={d.value}>
+                  {d.label}
+                </option>
+              ))}
+            </select>
+
+            {/* Sort Selector */}
+            <select
+              value={sort || "updated"}
+              onChange={(e) => onFilterChange({ sort: e.target.value })}
+              className="h-9 sm:h-9 rounded-xl border border-border/80 dark:border-white/10 bg-background/80 dark:bg-card/80 backdrop-blur-md px-3 text-xs text-foreground focus:border-primary/60 focus:outline-none cursor-pointer w-full lg:w-auto"
+              aria-label="Sort order"
+            >
+              <option value="updated">Recently Updated</option>
+              <option value="comments">Most Comments</option>
+              <option value="created">Newest Created</option>
+            </select>
+          </div>
+
+          {/* Action pills row */}
+          <div className="flex flex-wrap items-center gap-2 pt-1 sm:pt-0">
+            {/* Reset Filters */}
+            {isFiltered && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onResetFilters}
+                className="h-9 sm:h-8 text-xs text-muted-foreground hover:text-foreground gap-1 flex-1 sm:flex-none justify-center"
+              >
+                <RotateCcw className="h-3 w-3" />
+                <span>Reset</span>
+              </Button>
+            )}
+
+            {/* Saved Searches Dropdown */}
+            {onApplySavedSearch && (
+              <SavedSearches
+                currentFilters={{ query, language, difficulty, sort }}
+                onApply={onApplySavedSearch}
+              />
+            )}
+
+            {/* Preferences Button */}
+            {onOpenPreferences && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onOpenPreferences}
+                className="h-9 sm:h-8 text-xs gap-1.5 border-primary/30 text-primary hover:bg-primary/5 flex-1 sm:flex-none justify-center"
+              >
+                <Sparkles className="h-3 w-3" />
+                <span>Preferences</span>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

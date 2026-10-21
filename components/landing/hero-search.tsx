@@ -51,23 +51,23 @@ export function HeroSearch() {
         aria-hidden="true"
       />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 lg:py-28">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-20 lg:py-28">
         <div className="max-w-3xl">
           {/* Eyebrow */}
-          <p className="text-sm font-medium text-muted-foreground mb-6 flex items-center gap-2">
-            <Compass className="h-4 w-4 text-primary" />
-            Repository intelligence for open-source contributors
+          <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-4 sm:mb-6 flex items-center gap-2">
+            <Compass className="h-4 w-4 text-primary shrink-0" />
+            <span>Repository intelligence for open-source contributors</span>
           </p>
 
           {/* Headline — editorial, left-aligned, no gradient */}
-          <h1 className="text-4xl sm:text-5xl lg:text-[3.75rem] font-bold tracking-[-0.03em] text-foreground leading-[1.08] mb-6">
+          <h1 className="text-3xl sm:text-5xl lg:text-[3.75rem] font-bold tracking-[-0.03em] text-foreground leading-[1.12] sm:leading-[1.08] mb-4 sm:mb-6">
             Navigate your GitHub{" "}
             <br className="hidden sm:block" />
             backlog with clarity.
           </h1>
 
           {/* Supporting copy */}
-          <p className="text-[15px] sm:text-base text-muted-foreground max-w-[52ch] mb-10 leading-relaxed">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-[52ch] mb-8 sm:mb-10 leading-relaxed">
             Analyze any public repository for health scoring, stale issues, and duplicate detection.
             Discover beginner-friendly contribution opportunities with explainable relevance scoring.
           </p>
@@ -78,7 +78,7 @@ export function HeroSearch() {
             className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6 max-w-xl"
           >
             <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 pointer-events-none" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 pointer-events-none" />
               <input
                 type="text"
                 value={input}
@@ -87,7 +87,7 @@ export function HeroSearch() {
                   if (error) setError(null);
                 }}
                 placeholder="owner/repo or GitHub URL"
-                className="w-full rounded-xl border border-border bg-card/80 pl-10 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary/60 focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all backdrop-blur-sm"
+                className="w-full rounded-2xl border border-border/80 dark:border-white/15 bg-card/80 dark:bg-card/50 pl-11 pr-4 py-3.5 text-sm sm:text-base text-foreground placeholder:text-muted-foreground/50 focus:border-primary/60 focus:bg-background/90 dark:focus:bg-background/80 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all backdrop-blur-xl shadow-lg shadow-black/5"
                 autoFocus
               />
             </div>
@@ -96,7 +96,7 @@ export function HeroSearch() {
               type="submit"
               isLoading={isLoading}
               size="lg"
-              className="h-[46px] px-6 font-semibold text-sm gap-2 rounded-xl shrink-0"
+              className="h-[50px] px-7 font-semibold text-sm gap-2 rounded-2xl shrink-0 shadow-md active:scale-[0.98]"
             >
               Analyze
               <ArrowRight className="h-4 w-4" />
@@ -105,30 +105,30 @@ export function HeroSearch() {
 
           {/* Validation error */}
           {error && (
-            <div className="mb-6 flex items-center gap-2 text-sm text-destructive">
+            <div className="mb-6 flex items-center gap-2 text-sm text-destructive p-3 rounded-xl border border-destructive/20 bg-destructive/10 backdrop-blur-md">
               <AlertCircle className="h-4 w-4 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           {/* Sample repos + explore link */}
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
-            <span className="text-muted-foreground/60">Try:</span>
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+            <span className="text-muted-foreground/60 text-xs">Try:</span>
             {SAMPLE_REPOS.map((sample) => (
               <button
                 key={sample.name}
                 type="button"
                 onClick={() => handleSelectSample(sample.name)}
-                className="font-mono text-xs text-muted-foreground hover:text-primary transition-colors link-underline underline underline-offset-2 decoration-border hover:decoration-primary/50"
+                className="font-mono text-xs px-2.5 py-1 rounded-lg border border-border/70 dark:border-white/10 bg-card/60 dark:bg-white/5 backdrop-blur-md text-muted-foreground hover:text-foreground hover:border-primary/50 dark:hover:border-primary/50 transition-all cursor-pointer shadow-sm"
               >
                 {sample.name}
               </button>
             ))}
-            <span className="text-muted-foreground/30 hidden sm:inline">·</span>
+            <span className="text-muted-foreground/30 hidden sm:inline mx-1">·</span>
             <button
               type="button"
               onClick={() => router.push("/explore")}
-              className="text-primary hover:text-primary/80 font-medium transition-colors flex items-center gap-1"
+              className="text-primary hover:text-primary/80 font-medium transition-colors flex items-center gap-1 cursor-pointer text-xs sm:text-sm ml-1"
             >
               Browse beginner issues
               <ArrowRight className="h-3.5 w-3.5" />

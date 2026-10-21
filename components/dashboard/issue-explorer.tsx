@@ -111,30 +111,30 @@ export function IssueExplorer({ issues, repoFullName, onTriageIssue }: IssueExpl
   return (
     <div className="space-y-4">
       {/* Search and Main Filters Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-xl border border-border bg-card">
+      <div className="glass-card p-4 sm:p-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-sm">
         {/* Search Input */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 pointer-events-none" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search issues by title, #number, or @author..."
-            className="w-full rounded-md border border-border bg-background/60 pl-9 pr-4 py-1.5 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+            className="w-full rounded-xl border border-border/80 dark:border-white/10 bg-background/70 dark:bg-card/60 backdrop-blur-md pl-10 pr-4 py-2 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           />
         </div>
 
         {/* State and Sort Filters */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           {/* Status Tabs */}
-          <div className="inline-flex rounded-lg border border-border p-0.5 bg-muted/40 text-xs">
+          <div className="grid grid-cols-3 sm:inline-flex rounded-xl border border-border/80 dark:border-white/10 p-1 bg-muted/40 dark:bg-white/5 backdrop-blur-md text-xs">
             <button
               type="button"
               onClick={() => setStatusFilter("open")}
-              className={`px-2.5 py-1 rounded-md transition-all ${
+              className={`px-3 py-1.5 sm:py-1 rounded-lg transition-all cursor-pointer text-center ${
                 statusFilter === "open"
-                  ? "bg-background text-foreground font-semibold shadow-sm"
-                  : "text-muted-foreground"
+                  ? "bg-background dark:bg-card text-foreground font-semibold shadow-sm border border-border/60 dark:border-white/10"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Open
@@ -142,10 +142,10 @@ export function IssueExplorer({ issues, repoFullName, onTriageIssue }: IssueExpl
             <button
               type="button"
               onClick={() => setStatusFilter("closed")}
-              className={`px-2.5 py-1 rounded-md transition-all ${
+              className={`px-3 py-1.5 sm:py-1 rounded-lg transition-all cursor-pointer text-center ${
                 statusFilter === "closed"
-                  ? "bg-background text-foreground font-semibold shadow-sm"
-                  : "text-muted-foreground"
+                  ? "bg-background dark:bg-card text-foreground font-semibold shadow-sm border border-border/60 dark:border-white/10"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Closed
@@ -153,39 +153,41 @@ export function IssueExplorer({ issues, repoFullName, onTriageIssue }: IssueExpl
             <button
               type="button"
               onClick={() => setStatusFilter("all")}
-              className={`px-2.5 py-1 rounded-md transition-all ${
+              className={`px-3 py-1.5 sm:py-1 rounded-lg transition-all cursor-pointer text-center ${
                 statusFilter === "all"
-                  ? "bg-background text-foreground font-semibold shadow-sm"
-                  : "text-muted-foreground"
+                  ? "bg-background dark:bg-card text-foreground font-semibold shadow-sm border border-border/60 dark:border-white/10"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               All
             </button>
           </div>
 
-          {/* Stale Filter */}
-          <select
-            value={staleFilter}
-            onChange={(e) => setStaleFilter(e.target.value as any)}
-            className="h-8 rounded-md border border-border bg-background px-2.5 text-xs text-foreground focus:border-primary focus:outline-none"
-            aria-label="Filter by age"
-          >
-            <option value="all">Any Age</option>
-            <option value="stale">Stale (&gt;90d)</option>
-            <option value="active">Active (&lt;90d)</option>
-          </select>
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
+            {/* Stale Filter */}
+            <select
+              value={staleFilter}
+              onChange={(e) => setStaleFilter(e.target.value as any)}
+              className="h-9 sm:h-9 rounded-xl border border-border/80 dark:border-white/10 bg-background/80 dark:bg-card/80 backdrop-blur-md px-3 text-xs text-foreground focus:border-primary/60 focus:outline-none cursor-pointer w-full"
+              aria-label="Filter by age"
+            >
+              <option value="all">Any Age</option>
+              <option value="stale">Stale (&gt;90d)</option>
+              <option value="active">Active (&lt;90d)</option>
+            </select>
 
-          {/* Sort By */}
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
-            className="h-8 rounded-md border border-border bg-background px-2.5 text-xs text-foreground focus:border-primary focus:outline-none"
-            aria-label="Sort issues"
-          >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="comments">Most Comments</option>
-          </select>
+            {/* Sort By */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="h-9 sm:h-9 rounded-xl border border-border/80 dark:border-white/10 bg-background/80 dark:bg-card/80 backdrop-blur-md px-3 text-xs text-foreground focus:border-primary/60 focus:outline-none cursor-pointer w-full"
+              aria-label="Sort issues"
+            >
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="comments">Most Comments</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -233,31 +235,37 @@ export function IssueExplorer({ issues, repoFullName, onTriageIssue }: IssueExpl
       {/* Issues List */}
       <div className="space-y-2.5">
         {filteredIssues.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border p-12 text-center bg-card/40">
-            <Search className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
-            <p className="text-sm font-semibold text-foreground mb-1">No matching issues found</p>
-            <p className="text-xs text-muted-foreground mb-4">
-              Try adjusting your search criteria, clearing the label filter, or changing status.
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setSearch("");
-                setStatusFilter("all");
-                setStaleFilter("all");
-                setSelectedLabel(null);
-              }}
-              className="text-xs"
-            >
-              Reset All Filters
-            </Button>
+          <div className="glass-card rounded-2xl p-10 sm:p-12 text-center space-y-4">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/30 bg-primary/10 text-primary backdrop-blur-md shadow-sm">
+              <Search className="h-6 w-6" />
+            </div>
+            <div className="space-y-1.5">
+              <p className="text-base sm:text-lg font-bold text-foreground tracking-[-0.02em]">No matching issues found</p>
+              <p className="text-xs sm:text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                Try adjusting your search criteria, clearing the label filter, or changing status.
+              </p>
+            </div>
+            <div className="pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSearch("");
+                  setStatusFilter("all");
+                  setStaleFilter("all");
+                  setSelectedLabel(null);
+                }}
+                className="text-xs"
+              >
+                Reset All Filters
+              </Button>
+            </div>
           </div>
         ) : (
           paginatedIssues.map((issue) => (
             <div
               key={issue.id}
-              className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-border/80 bg-card hover:border-primary/40 transition-colors shadow-sm"
+              className="glass-card-interactive flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4"
             >
               {/* Left Details */}
               <div className="min-w-0 flex-1 space-y-1.5">
@@ -316,10 +324,10 @@ export function IssueExplorer({ issues, repoFullName, onTriageIssue }: IssueExpl
               </div>
 
               {/* Right Action buttons */}
-              <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
+              <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-border/40">
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <MessageSquare className="h-3.5 w-3.5" />
-                  <span className="font-mono">{issue.commentsCount}</span>
+                  <span className="font-mono">{issue.commentsCount} comments</span>
                 </div>
 
                 <Button
@@ -339,8 +347,8 @@ export function IssueExplorer({ issues, repoFullName, onTriageIssue }: IssueExpl
 
       {/* Pagination Bar */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-card/60 text-xs text-muted-foreground">
-          <span>
+        <div className="glass-card p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
+          <span className="text-center sm:text-left">
             Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–
             {Math.min(currentPage * ITEMS_PER_PAGE, filteredIssues.length)} of {filteredIssues.length} issues
           </span>
@@ -351,13 +359,13 @@ export function IssueExplorer({ issues, repoFullName, onTriageIssue }: IssueExpl
               size="sm"
               disabled={currentPage <= 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="h-7 px-2 text-xs"
+              className="h-8 px-2.5 text-xs"
             >
               <ChevronLeft className="h-3.5 w-3.5 mr-1" />
               Previous
             </Button>
 
-            <span className="font-mono">
+            <span className="font-mono text-foreground font-medium px-1">
               Page {currentPage} of {totalPages}
             </span>
 
@@ -366,7 +374,7 @@ export function IssueExplorer({ issues, repoFullName, onTriageIssue }: IssueExpl
               size="sm"
               disabled={currentPage >= totalPages}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="h-7 px-2 text-xs"
+              className="h-8 px-2.5 text-xs"
             >
               Next
               <ChevronRight className="h-3.5 w-3.5 ml-1" />

@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, ArrowRight, Eye, EyeOff, Lock, Mail, CheckCircle2, Info } from "lucide-react";
 import { AuthCard } from "@/components/auth/auth-card";
 import { GithubButton } from "@/components/auth/github-button";
+import { GoogleButton } from "@/components/auth/google-button";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth/auth-provider";
 
@@ -27,11 +28,13 @@ function SignInContent() {
 
   React.useEffect(() => {
     if (urlError === "github_unconfigured") {
-      setError("GitHub OAuth credentials (GITHUB_CLIENT_ID & GITHUB_CLIENT_SECRET) are not set in .env. You can sign in with your email/password below.");
-    } else if (urlError === "oauth_denied") {
-      setError("GitHub authorization request was cancelled.");
+      setError("GitHub OAuth credentials (GITHUB_CLIENT_ID & GITHUB_CLIENT_SECRET) are not configured in .env. You can sign in with Google or your email below.");
+    } else if (urlError === "google_unconfigured") {
+      setError("Google OAuth credentials (GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET) are not configured in .env. You can sign in with GitHub or your email below.");
+    } else if (urlError === "oauth_denied" || urlError === "google_oauth_denied") {
+      setError("Authorization request was cancelled.");
     } else if (urlError === "invalid_state") {
-      setError("Security validation failed during GitHub login. Please try again.");
+      setError("Security validation failed during authentication. Please try again.");
     } else if (urlError) {
       setError("Authentication failed. Please verify your credentials.");
     }
@@ -96,8 +99,11 @@ function SignInContent() {
           </div>
         )}
 
-        {/* GitHub OAuth Button */}
-        <GithubButton returnUrl={returnUrl} />
+        {/* OAuth Buttons */}
+        <div className="space-y-2.5">
+          <GithubButton returnUrl={returnUrl} />
+          <GoogleButton returnUrl={returnUrl} />
+        </div>
 
         {/* Divider */}
         <div className="relative flex items-center justify-center">

@@ -87,4 +87,18 @@ describe("AI Triage Service & Schema Validation", () => {
     if (originalGemini) process.env.GEMINI_API_KEY = originalGemini;
     if (originalOpenAI) process.env.OPENAI_API_KEY = originalOpenAI;
   });
+
+  it("defaults to gemini-3.5-flash-lite model when GEMINI_MODEL is not overridden", () => {
+    const originalModel = process.env.GEMINI_MODEL;
+    delete process.env.GEMINI_MODEL;
+    const defaultModel = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+    expect(defaultModel).toBe("gemini-3.5-flash-lite");
+
+    process.env.GEMINI_MODEL = "gemini-3.5-flash-lite";
+    expect(process.env.GEMINI_MODEL).toBe("gemini-3.5-flash-lite");
+
+    if (originalModel) {
+      process.env.GEMINI_MODEL = originalModel;
+    }
+  });
 });

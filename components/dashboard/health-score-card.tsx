@@ -29,7 +29,7 @@ export function HealthScoreCard({ data }: HealthScoreCardProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       {/* Grade and Total Score Card */}
-      <Card className="md:col-span-1 bg-card border-border flex flex-col justify-between p-5">
+      <Card className="md:col-span-1 flex flex-col justify-between p-5">
         <div>
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -40,7 +40,7 @@ export function HealthScoreCard({ data }: HealthScoreCardProps) {
 
           <div className="flex items-baseline gap-3 mb-2">
             <span
-              className={`text-4xl font-extrabold px-3 py-1 rounded-lg border font-mono ${getGradeColor(
+              className={`text-4xl font-extrabold px-3 py-1 rounded-xl border font-mono backdrop-blur-md shadow-sm ${getGradeColor(
                 health.grade
               )}`}
             >
@@ -53,7 +53,7 @@ export function HealthScoreCard({ data }: HealthScoreCardProps) {
           </div>
         </div>
 
-        <div className="pt-3 border-t border-border/60 text-xs text-muted-foreground">
+        <div className="pt-3 border-t border-border/60 dark:border-white/10 text-xs text-muted-foreground">
           {health.score >= 80 ? (
             <span className="text-emerald-600 dark:text-emerald-400 font-medium">
               Excellent maintenance velocity & responsiveness.
@@ -71,7 +71,7 @@ export function HealthScoreCard({ data }: HealthScoreCardProps) {
       </Card>
 
       {/* Breakdown metrics */}
-      <Card className="md:col-span-3 bg-card border-border p-5">
+      <Card className="md:col-span-3 p-5">
         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-4">
           Health Breakdown & Velocity Diagnostics
         </span>

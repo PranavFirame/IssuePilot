@@ -54,4 +54,26 @@ describe("calculateRecommendationScore", () => {
 
     expect(result.score).toBeLessThan(50);
   });
+
+  it("handles special characters in languages like C++ and C# without regex SyntaxErrors", () => {
+    const cppIssue: BeginnerIssue = {
+      ...sampleIssue,
+      title: "Fix memory allocator in C++ core backend",
+      repository: {
+        ...sampleIssue.repository,
+        language: "C++",
+      },
+      labels: [{ id: 3, name: "c++", color: "f34b7d" }],
+    };
+
+    expect(() => {
+      const result = calculateRecommendationScore(cppIssue, {
+        languages: ["C++", "C#"],
+        experienceLevel: "beginner",
+        topics: ["c++", "compiler"],
+      });
+      expect(result.score).toBeGreaterThanOrEqual(60);
+      expect(result.reasons.some((r) => r.includes("C++"))).toBe(true);
+    }).not.toThrow();
+  });
 });

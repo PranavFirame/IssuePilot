@@ -97,12 +97,16 @@ export function PersonalizedRecommendations({
 
   if (scoredIssues.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 p-12 text-center space-y-3">
-        <Compass className="h-10 w-10 text-muted-foreground/40 mx-auto" />
-        <h3 className="text-base font-semibold text-foreground">No matches found for your current preferences</h3>
-        <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
-          Try expanding your preferred languages or updating your experience level in your profile settings.
-        </p>
+      <div className="glass-card rounded-2xl p-10 sm:p-12 text-center space-y-4">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/30 bg-primary/10 text-primary backdrop-blur-md shadow-sm">
+          <Compass className="h-6 w-6" />
+        </div>
+        <div className="space-y-1.5">
+          <h3 className="text-base sm:text-lg font-bold text-foreground tracking-[-0.02em]">No matches found for your current preferences</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed">
+            Try expanding your preferred languages or updating your experience level in your profile settings.
+          </p>
+        </div>
         <div className="pt-2 flex items-center justify-center gap-2">
           {onOpenCalibration ? (
             <button
@@ -136,7 +140,7 @@ export function PersonalizedRecommendations({
   return (
     <div className="space-y-4">
       {/* Explanation Banner */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 rounded-xl border border-primary/20 bg-primary/5 text-xs">
+      <div className="glass-card rounded-2xl border-primary/30 bg-primary/10 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2 text-foreground font-medium">
           <Sparkles className="h-4 w-4 text-primary shrink-0" />
           <span>

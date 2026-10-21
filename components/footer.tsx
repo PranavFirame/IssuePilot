@@ -3,7 +3,7 @@ import { Compass, ShieldCheck, Cpu, Database } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="w-full border-t border-border/40 py-10 transition-colors">
+    <footer className="w-full border-t border-border/60 dark:border-white/10 bg-background/60 dark:bg-background/40 backdrop-blur-xl py-10 transition-colors">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           {/* Brand + description */}

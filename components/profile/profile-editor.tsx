@@ -59,10 +59,10 @@ export function ProfileEditor({ user, onProfileUpdated }: ProfileEditorProps) {
   return (
     <form onSubmit={handleSave} className="space-y-6">
       {/* Top Banner: Verified Identity distinction */}
-      <div className="rounded-xl border border-border/80 bg-accent/20 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="glass-card p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-3.5">
           {avatarUrl ? (
-            <div className="relative h-14 w-14 rounded-xl overflow-hidden border border-border bg-card shrink-0 shadow-sm">
+            <div className="relative h-14 w-14 rounded-xl overflow-hidden border border-border/80 dark:border-white/10 bg-card shrink-0 shadow-sm">
               <Image
                 src={avatarUrl}
                 alt={name || user.email}
@@ -73,7 +73,7 @@ export function ProfileEditor({ user, onProfileUpdated }: ProfileEditorProps) {
               />
             </div>
           ) : (
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-primary/30 bg-primary/10 text-primary text-xl font-bold shrink-0">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-primary/30 bg-primary/10 text-primary text-xl font-bold shrink-0 backdrop-blur-md">
               {(name || user.email).charAt(0).toUpperCase()}
             </div>
           )}
@@ -87,7 +87,7 @@ export function ProfileEditor({ user, onProfileUpdated }: ProfileEditorProps) {
                   Verified GitHub
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted/60 px-2 py-0.5 text-[10px] text-muted-foreground">
+                <span className="inline-flex items-center gap-1 rounded-full border border-border/80 dark:border-white/10 bg-muted/60 dark:bg-white/5 px-2 py-0.5 text-[10px] text-muted-foreground">
                   Email Account
                 </span>
               )}
@@ -102,7 +102,7 @@ export function ProfileEditor({ user, onProfileUpdated }: ProfileEditorProps) {
             href={`https://github.com/${user.githubUsername}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/80 bg-background/50 hover:bg-accent text-xs font-mono text-foreground transition-colors shrink-0"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/80 dark:border-white/10 bg-background/50 dark:bg-white/5 backdrop-blur-md hover:bg-accent text-xs font-mono text-foreground transition-colors shrink-0"
           >
             <Github className="h-3.5 w-3.5" />
             <span>@{user.githubUsername}</span>
@@ -111,7 +111,7 @@ export function ProfileEditor({ user, onProfileUpdated }: ProfileEditorProps) {
         ) : (
           <Button
             type="button"
-            variant="outline"
+            variant="glass"
             size="sm"
             onClick={() => (window.location.href = "/api/auth/github?returnUrl=/profile")}
             className="text-xs gap-1.5 shrink-0"
@@ -147,7 +147,7 @@ export function ProfileEditor({ user, onProfileUpdated }: ProfileEditorProps) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name or handle"
-            className="w-full rounded-lg border border-border bg-card/60 px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary/60 focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all"
+            className="w-full rounded-xl border border-border/80 dark:border-white/10 bg-card/60 dark:bg-card/40 backdrop-blur-md px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary/60 focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all"
           />
         </div>
 
@@ -161,7 +161,7 @@ export function ProfileEditor({ user, onProfileUpdated }: ProfileEditorProps) {
             value={avatarUrl}
             onChange={(e) => setAvatarUrl(e.target.value)}
             placeholder="https://avatars.githubusercontent.com/..."
-            className="w-full rounded-lg border border-border bg-card/60 px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary/60 focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all font-mono text-xs"
+            className="w-full rounded-xl border border-border/80 dark:border-white/10 bg-card/60 dark:bg-card/40 backdrop-blur-md px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary/60 focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all font-mono text-xs"
           />
         </div>
 
@@ -179,7 +179,7 @@ export function ProfileEditor({ user, onProfileUpdated }: ProfileEditorProps) {
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             placeholder="Share a short summary of your background, experience, or what open-source projects you love..."
-            className="w-full rounded-lg border border-border bg-card/60 px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary/60 focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all resize-none leading-relaxed"
+            className="w-full rounded-xl border border-border/80 dark:border-white/10 bg-card/60 dark:bg-card/40 backdrop-blur-md px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary/60 focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/15 transition-all resize-none leading-relaxed"
           />
         </div>
       </div>
