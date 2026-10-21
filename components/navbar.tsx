@@ -18,6 +18,7 @@ import {
   Sliders,
   LayoutDashboard,
   ChevronDown,
+  BarChart3,
 } from "lucide-react";
 import { useTheme } from "./theme-provider";
 import { useAuth } from "./auth/auth-provider";
@@ -127,17 +128,16 @@ export function Navbar({ onOpenSavedReports }: NavbarProps) {
 
         {/* Action Controls */}
         <div className="flex items-center gap-2">
-          {onOpenSavedReports && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onOpenSavedReports}
-              className="gap-1.5 text-xs sm:text-sm h-9 border-border/80 hidden sm:inline-flex"
-            >
-              <History className="h-3.5 w-3.5" />
-              <span>Saved</span>
-            </Button>
-          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onOpenSavedReports || (() => router.push("/workspace?view=analyzed"))}
+            className="gap-1.5 text-xs sm:text-sm h-9 border-border/80 hidden sm:inline-flex"
+            title="View saved and analyzed repositories"
+          >
+            <History className="h-3.5 w-3.5" />
+            <span>Saved</span>
+          </Button>
 
           {/* Theme switcher */}
           <Button
@@ -206,6 +206,15 @@ export function Navbar({ onOpenSavedReports }: NavbarProps) {
                   >
                     <LayoutDashboard className="h-3.5 w-3.5 text-primary" />
                     <span>Personal Dashboard</span>
+                  </Link>
+
+                  <Link
+                    href="/workspace?view=analyzed"
+                    onClick={() => setIsUserMenuOpen(false)}
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-foreground hover:bg-accent/60 transition-colors"
+                  >
+                    <BarChart3 className="h-3.5 w-3.5 text-indigo-400" />
+                    <span>Analyzed Repositories</span>
                   </Link>
 
                   <Link

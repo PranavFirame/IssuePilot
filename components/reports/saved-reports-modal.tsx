@@ -102,10 +102,10 @@ export function SavedReportsModal({ isOpen, onClose }: SavedReportsModalProps) {
           ) : reports.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <History className="h-10 w-10 mx-auto mb-3 opacity-30" />
-              <p className="text-sm font-medium text-foreground mb-1">No saved snapshots yet</p>
+              <p className="text-sm font-medium text-foreground mb-1">No saved analyses yet</p>
               <p className="text-xs max-w-sm mx-auto">
-                Analyze any repository, then click the <strong>Save Snapshot</strong> button in the
-                dashboard to persist your intelligence reports here.
+                Repositories you analyze or snapshot are automatically persisted here and in your{" "}
+                <strong>Workspace</strong> for quick access.
               </p>
             </div>
           ) : (

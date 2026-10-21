@@ -45,13 +45,13 @@ export function RepoHeader({ data, onRefresh }: RepoHeaderProps) {
           owner: repository.owner,
           repo: repository.repo,
           repoName: repository.fullName,
-          description: repository.description,
-          stars: repository.stars,
-          forks: repository.forks,
-          openIssues: repository.openIssuesCount,
-          openPrs: repository.openPrCount,
-          healthScore: health.score,
-          primaryLanguage: repository.language,
+          description: repository.description || null,
+          stars: Math.max(0, Math.round(repository.stars || 0)),
+          forks: Math.max(0, Math.round(repository.forks || 0)),
+          openIssues: Math.max(0, Math.round(repository.openIssuesCount || 0)),
+          openPrs: Math.max(0, Math.round(repository.openPrCount || 0)),
+          healthScore: Math.max(0, Math.min(100, Math.round(health.score || 0))),
+          primaryLanguage: repository.language || null,
           dataSnapshot: JSON.stringify(data),
         }),
       });
@@ -62,7 +62,7 @@ export function RepoHeader({ data, onRefresh }: RepoHeaderProps) {
       }
 
       setSavedSuccess(true);
-      setTimeout(() => setSavedSuccess(false), 3000);
+      setTimeout(() => setSavedSuccess(false), 4000);
     } catch (err: unknown) {
       setSaveError(err instanceof Error ? err.message : "Error saving snapshot");
     } finally {

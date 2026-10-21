@@ -71,6 +71,7 @@ model VerificationToken {
 
 model SavedAnalysis {
   id              String   @id @default(cuid())
+  userId          String?  @default("default-user")
   owner           String
   repo            String
   repoName        String
@@ -85,6 +86,7 @@ model SavedAnalysis {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
+  @@index([userId, createdAt])
   @@index([owner, repo])
   @@index([createdAt])
 }

@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Bookmark,
   CheckCircle2,
@@ -19,6 +19,11 @@ import {
   User,
   ArrowRight,
   ExternalLink,
+  Trash2,
+  BarChart3,
+  Star,
+  GitFork,
+  Search,
 } from "lucide-react";
 import {
   ClientTrackedIssue,
@@ -42,14 +47,18 @@ import { LinkPrModal } from "@/components/workspace/link-pr-modal";
 import { AiTriageModal } from "@/components/triage/ai-triage-modal";
 import { SavedReportsModal } from "@/components/reports/saved-reports-modal";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatNumber } from "@/lib/utils";
 
-export default function WorkspacePage() {
+function WorkspaceContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialView = (searchParams.get("view") as any) || "tracked";
+
   const { user, isAuthenticated } = useAuth();
 
   const [trackedIssues, setTrackedIssues] = React.useState<ClientTrackedIssue[]>([]);
   const [recentlyViewed, setRecentlyViewed] = React.useState<any[]>([]);
+  const [savedReports, setSavedReports] = React.useState<any[]>([]);
   const [preferences, setPreferences] = React.useState<UserPreferencesData>({
     languages: ["TypeScript", "JavaScript", "Python"],
     experienceLevel: "beginner",
@@ -57,9 +66,12 @@ export default function WorkspacePage() {
     monthlyGoal: 3,
   });
 
-  const [mainView, setMainView] = React.useState<"tracked" | "recommendations" | "recent" | "goals">("tracked");
+  const [mainView, setMainView] = React.useState<"tracked" | "recommendations" | "analyzed" | "recent" | "goals">(
+    ["tracked", "recommendations", "analyzed", "recent", "goals"].includes(initialView) ? initialView : "tracked"
+  );
   const [activeTab, setActiveTab] = React.useState<"all" | "saved" | "interested" | "in_progress" | "completed">("all");
   const [isLoading, setIsLoading] = React.useState(true);
+  const [quickRepoInput, setQuickRepoInput] = React.useState("");
 
   const [editingNotesItem, setEditingNotesItem] = React.useState<ClientTrackedIssue | null>(null);
   const [linkingPrItem, setLinkingPrItem] = React.useState<ClientTrackedIssue | null>(null);
@@ -73,11 +85,22 @@ export default function WorkspacePage() {
       setTrackedIssues(issues);
       setPreferences(prefs);
 
-      // Load recently viewed
-      const res = await fetch("/api/workspace");
-      if (res.ok) {
-        const data = await res.json();
+      // Load recently viewed & saved analysis reports in parallel
+      const [workspaceRes, reportsRes] = await Promise.all([
+        fetch("/api/workspace"),
+        fetch("/api/reports"),
+      ]);
+
+      if (workspaceRes.ok) {
+        const data = await workspaceRes.json();
         setRecentlyViewed(data.recentlyViewed || []);
+      }
+
+      if (reportsRes.ok) {
+        const reportsData = await reportsRes.json();
+        if (Array.isArray(reportsData)) {
+          setSavedReports(reportsData);
+        }
       }
     } catch {
       // Graceful fallback
@@ -89,6 +112,13 @@ export default function WorkspacePage() {
   React.useEffect(() => {
     loadWorkspaceData();
   }, [loadWorkspaceData]);
+
+  React.useEffect(() => {
+    const view = searchParams.get("view");
+    if (view && ["tracked", "recommendations", "analyzed", "recent", "goals"].includes(view)) {
+      setMainView(view as any);
+    }
+  }, [searchParams]);
 
   const handleStatusChange = async (
     id: string,
@@ -125,6 +155,17 @@ export default function WorkspacePage() {
   const handleRemove = async (id: string) => {
     await removeTrackedIssue(id);
     setTrackedIssues((prev) => prev.filter((i) => i.id !== id));
+  };
+
+  const handleDeleteReport = async (id: string) => {
+    try {
+      const res = await fetch(`/api/reports?id=${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setSavedReports((prev) => prev.filter((r) => r.id !== id));
+      }
+    } catch {
+      // Handle error
+    }
   };
 
   const handleTrackIssueFromRecommendations = async (
@@ -222,7 +263,11 @@ export default function WorkspacePage() {
                 </span>
                 <span>•</span>
                 <span>
-                  Active Bookmarks: <strong className="text-primary">{trackedIssues.length}</strong>
+                  Bookmarks: <strong className="text-primary">{trackedIssues.length}</strong>
+                </span>
+                <span>•</span>
+                <span>
+                  Saved Analyses: <strong className="text-cyan-400">{savedReports.length}</strong>
                 </span>
               </div>
             </div>
@@ -252,7 +297,7 @@ export default function WorkspacePage() {
             <div className="flex items-center gap-2.5 text-muted-foreground">
               <Sparkles className="h-4 w-4 text-primary shrink-0" />
               <span>
-                You are browsing as a guest. <strong className="text-foreground">Sign in</strong> to sync your bookmarks across devices, save private implementation notes, and unlock custom relevance matching.
+                You are browsing as a guest. <strong className="text-foreground">Sign in</strong> to sync your bookmarks, analyzed repository reports, and private notes across devices.
               </span>
             </div>
             <Link
@@ -298,6 +343,22 @@ export default function WorkspacePage() {
 
           <button
             type="button"
+            onClick={() => setMainView("analyzed")}
+            className={`flex items-center gap-2 px-3 py-2.5 border-b-2 transition-all whitespace-nowrap ${
+              mainView === "analyzed"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <BarChart3 className="h-4 w-4 text-indigo-400" />
+            <span>Analyzed Repositories</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-muted text-[10px] font-mono">
+              {savedReports.length}
+            </span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setMainView("recent")}
             className={`flex items-center gap-2 px-3 py-2.5 border-b-2 transition-all whitespace-nowrap ${
               mainView === "recent"
@@ -305,7 +366,7 @@ export default function WorkspacePage() {
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
-            <History className="h-4 w-4 text-indigo-400" />
+            <History className="h-4 w-4 text-muted-foreground" />
             <span>Recently Viewed</span>
             {recentlyViewed.length > 0 && (
               <span className="px-1.5 py-0.2 rounded-full bg-muted text-[10px] font-mono">
@@ -435,7 +496,132 @@ export default function WorkspacePage() {
           />
         )}
 
-        {/* View 3: Recently Viewed */}
+        {/* View 3: Analyzed Repositories */}
+        {mainView === "analyzed" && (
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl border border-border/80 bg-card/40 text-xs">
+              <div>
+                <p className="font-semibold text-foreground">Saved Repository Snapshots &amp; Analyses</p>
+                <p className="text-muted-foreground mt-0.5">
+                  Every repository analyzed in IssuePilot is automatically saved so you can review metrics anytime.
+                </p>
+              </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (quickRepoInput.trim()) {
+                    router.push(`/repo/${quickRepoInput.trim().replace(/^https?:\/\/github\.com\//, "")}`);
+                  }
+                }}
+                className="flex items-center gap-2 w-full sm:w-auto"
+              >
+                <div className="relative flex-1 sm:w-60">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
+                  <input
+                    type="text"
+                    value={quickRepoInput}
+                    onChange={(e) => setQuickRepoInput(e.target.value)}
+                    placeholder="Analyze repo (owner/repo)..."
+                    className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+                <Button type="submit" size="sm" className="text-xs h-8 shrink-0">
+                  Analyze
+                </Button>
+              </form>
+            </div>
+
+            {savedReports.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border/80 p-12 text-center bg-card/40 space-y-3">
+                <BarChart3 className="h-10 w-10 text-muted-foreground/30 mx-auto" />
+                <h3 className="text-base font-semibold text-foreground">No analyzed repositories yet</h3>
+                <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                  Enter any public GitHub repository (e.g. <code>facebook/react</code> or <code>vercel/next.js</code>) to evaluate health scores, detect duplicate tickets, and save intelligence reports.
+                </p>
+                <Button
+                  size="sm"
+                  onClick={() => router.push("/")}
+                  className="text-xs mt-2"
+                >
+                  Analyze a Repository
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {savedReports.map((report) => (
+                  <div
+                    key={report.id}
+                    className="flex flex-col justify-between p-5 rounded-xl border border-border/80 bg-card/60 hover:border-primary/40 transition-colors shadow-sm space-y-4"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <Link
+                          href={`/repo/${report.owner}/${report.repo}`}
+                          className="text-sm font-bold text-foreground hover:text-primary transition-colors font-mono truncate"
+                        >
+                          {report.repoName || `${report.owner}/${report.repo}`}
+                        </Link>
+                        <span className="px-2 py-0.5 rounded-full text-xs font-bold font-mono border border-primary/30 bg-primary/10 text-primary shrink-0">
+                          Health: {report.healthScore}/100
+                        </span>
+                      </div>
+
+                      {report.description && (
+                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                          {report.description}
+                        </p>
+                      )}
+
+                      <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-muted-foreground">
+                        {report.primaryLanguage && (
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-muted text-foreground">
+                            {report.primaryLanguage}
+                          </span>
+                        )}
+                        <span className="flex items-center gap-1 font-mono text-[11px]">
+                          <Star className="h-3 w-3 text-amber-500 fill-amber-500" />
+                          {formatNumber(report.stars || 0)}
+                        </span>
+                        <span className="flex items-center gap-1 font-mono text-[11px]">
+                          <GitFork className="h-3 w-3" />
+                          {formatNumber(report.forks || 0)}
+                        </span>
+                        <span className="font-mono text-[11px]">
+                          {report.openIssues || 0} issues
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-3 border-t border-border/60 text-xs text-muted-foreground">
+                      <span className="text-[11px]">
+                        Saved {formatDate(report.updatedAt || report.createdAt)}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteReport(report.id)}
+                          className="h-7 text-xs text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                        <Link
+                          href={`/repo/${report.owner}/${report.repo}`}
+                          className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors"
+                        >
+                          <span>View Analysis</span>
+                          <ArrowRight className="h-3 w-3" />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* View 4: Recently Viewed */}
         {mainView === "recent" && (
           <div className="space-y-4">
             {recentlyViewed.length === 0 ? (
@@ -501,7 +687,7 @@ export default function WorkspacePage() {
           </div>
         )}
 
-        {/* View 4: Goals & Progress */}
+        {/* View 5: Goals & Progress */}
         {mainView === "goals" && (
           <div className="space-y-6">
             <ContributionStats
@@ -568,5 +754,19 @@ export default function WorkspacePage() {
         onClose={() => setIsSavedReportsOpen(false)}
       />
     </div>
+  );
+}
+
+export default function WorkspacePage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <WorkspaceContent />
+    </React.Suspense>
   );
 }

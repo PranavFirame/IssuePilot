@@ -3,11 +3,70 @@ import { z } from "zod";
 import { parseRepositoryUrl } from "@/lib/github/url-parser";
 import { GitHubApiError, GitHubClient } from "@/lib/github/client";
 import { getFallbackRepoPayload } from "@/lib/github/fallback-data";
+import { getServerAuthUser } from "@/lib/auth/session";
+import { prisma } from "@/lib/db/prisma";
+import { RepositoryAnalysisPayload } from "@/lib/github/types";
 
 const analyzeRequestSchema = z.object({
   repo: z.string().min(1).max(300),
   bypassCache: z.boolean().optional(),
 });
+
+async function autoSaveAnalysis(
+  payload: RepositoryAnalysisPayload,
+  userId: string
+): Promise<string | undefined> {
+  try {
+    const { repository, health } = payload;
+    const existing = await prisma.savedAnalysis.findFirst({
+      where: {
+        userId,
+        owner: repository.owner,
+        repo: repository.repo,
+      },
+    });
+
+    if (existing) {
+      const updated = await prisma.savedAnalysis.update({
+        where: { id: existing.id },
+        data: {
+          repoName: repository.fullName,
+          description: repository.description || null,
+          stars: Math.max(0, Math.round(repository.stars || 0)),
+          forks: Math.max(0, Math.round(repository.forks || 0)),
+          openIssues: Math.max(0, Math.round(repository.openIssuesCount || 0)),
+          openPrs: Math.max(0, Math.round(repository.openPrCount || 0)),
+          healthScore: Math.max(0, Math.min(100, Math.round(health.score || 0))),
+          primaryLanguage: repository.language || null,
+          dataSnapshot: JSON.stringify(payload),
+          updatedAt: new Date(),
+        },
+      });
+      return updated.id;
+    } else {
+      const created = await prisma.savedAnalysis.create({
+        data: {
+          userId,
+          owner: repository.owner,
+          repo: repository.repo,
+          repoName: repository.fullName,
+          description: repository.description || null,
+          stars: Math.max(0, Math.round(repository.stars || 0)),
+          forks: Math.max(0, Math.round(repository.forks || 0)),
+          openIssues: Math.max(0, Math.round(repository.openIssuesCount || 0)),
+          openPrs: Math.max(0, Math.round(repository.openPrCount || 0)),
+          healthScore: Math.max(0, Math.min(100, Math.round(health.score || 0))),
+          primaryLanguage: repository.language || null,
+          dataSnapshot: JSON.stringify(payload),
+        },
+      });
+      return created.id;
+    }
+  } catch (err) {
+    console.error("Auto-save analysis error:", err);
+    return undefined;
+  }
+}
 
 export async function POST(req: NextRequest) {
   let parsedOwner = "";
@@ -38,21 +97,33 @@ export async function POST(req: NextRequest) {
     const { owner, repo } = parseResult.data;
     parsedOwner = owner;
     parsedRepo = repo;
+
+    const authUser = await getServerAuthUser(req);
+    const userId = authUser ? authUser.id : "default-user";
+
     const client = new GitHubClient();
 
     const analysis = await client.analyzeRepository(owner, repo, {
       bypassCache: validation.data.bypassCache,
     });
 
-    return NextResponse.json(analysis, { status: 200 });
+    // Automatically persist analyzed data so user never loses it
+    const savedId = await autoSaveAnalysis(analysis, userId);
+
+    return NextResponse.json({ ...analysis, savedAnalysisId: savedId }, { status: 200 });
   } catch (error: unknown) {
     if (error instanceof GitHubApiError) {
       if (error.isRateLimit && parsedOwner && parsedRepo) {
         // Provide immediate functional fallback so maintainers can test the UI without blocking
         const fallback = getFallbackRepoPayload(parsedOwner, parsedRepo);
+        const authUser = await getServerAuthUser(req);
+        const userId = authUser ? authUser.id : "default-user";
+        const savedId = await autoSaveAnalysis(fallback, userId);
+
         return NextResponse.json(
           {
             ...fallback,
+            savedAnalysisId: savedId,
             isDemoFallback: true,
             warning: error.message,
             resetAt: error.resetAt,
@@ -81,4 +152,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

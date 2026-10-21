@@ -7,6 +7,7 @@ import {
   POST as saveReportHandler,
 } from "../../app/api/reports/route";
 import { NextRequest } from "next/server";
+import { prisma } from "@/lib/db/prisma";
 
 describe("API Route Integration Tests", () => {
   describe("/api/analyze", () => {
@@ -32,6 +33,26 @@ describe("API Route Integration Tests", () => {
       expect(res.status).toBe(400);
       const json = await res.json();
       expect(json.error).toContain("Only public GitHub repositories");
+    });
+
+    it("auto-saves repository analysis to the database and returns savedAnalysisId", async () => {
+      const req = new NextRequest("http://localhost:3000/api/analyze", {
+        method: "POST",
+        body: JSON.stringify({ repo: "facebook/react" }),
+      });
+
+      const res = await analyzeHandler(req);
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.repository).toBeDefined();
+      expect(json.savedAnalysisId).toBeDefined();
+
+      const saved = await prisma.savedAnalysis.findUnique({
+        where: { id: json.savedAnalysisId },
+      });
+      expect(saved).not.toBeNull();
+      expect(saved?.owner.toLowerCase()).toBe("facebook");
+      expect(saved?.repo.toLowerCase()).toBe("react");
     });
   });
 
