@@ -278,7 +278,7 @@ function ExploreContent() {
             <Compass className="h-10 w-10 text-muted-foreground/30 mx-auto" />
             <h3 className="text-base font-semibold text-foreground">No matching beginner issues found</h3>
             <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-              Try removing some search filters, switching language to "All", or selecting a different
+              Try removing some search filters, switching language to &quot;All&quot;, or selecting a different
               difficulty tag.
             </p>
             <Button variant="outline" size="sm" onClick={handleResetFilters} className="text-xs">

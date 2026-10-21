@@ -3,6 +3,9 @@ import { z } from "zod";
 import { prisma } from "@/lib/db/prisma";
 import { verifyPassword } from "@/lib/auth/password";
 import { createSession, setSessionCookie } from "@/lib/auth/session";
+import { extractGuestId } from "@/lib/auth/guest-session";
+import { migrateGuestData } from "@/lib/auth/guest-migration";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limiter";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -11,6 +14,15 @@ const loginSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = getClientIp(req);
+    const rateLimit = checkRateLimit(`login:${ip}`, 10, 60);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many login attempts. Please wait a minute before trying again." },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const validation = loginSchema.safeParse(body);
 
@@ -64,6 +76,13 @@ export async function POST(req: NextRequest) {
     );
 
     setSessionCookie(sessionToken, expiresAt, response);
+
+    // Safely migrate any guest data the visitor created before signing in
+    const guestId = extractGuestId(req);
+    if (guestId) {
+      await migrateGuestData(guestId, user.id, response);
+    }
+
     return response;
   } catch (error: unknown) {
     return NextResponse.json(

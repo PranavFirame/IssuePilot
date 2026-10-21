@@ -10,8 +10,10 @@ import {
   Clock,
   Bookmark,
   ChevronDown,
+  Sparkles,
 } from "lucide-react";
 import { ClientTrackedIssue } from "@/lib/workspace/storage";
+import { IssueBreakdown } from "../explore/issue-breakdown";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 
@@ -34,6 +36,8 @@ export function TrackedIssueCard({
   onRemove,
 }: TrackedIssueCardProps) {
   const [showStatusMenu, setShowStatusMenu] = React.useState(false);
+  const [showBreakdown, setShowBreakdown] = React.useState(false);
+  const [confirmDelete, setConfirmDelete] = React.useState(false);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -164,6 +168,18 @@ export function TrackedIssueCard({
         </div>
       )}
 
+      {/* Expandable Issue Breakdown */}
+      {showBreakdown && (
+        <IssueBreakdown
+          title={item.title}
+          labels={item.labels}
+          language={item.language}
+          owner={item.repoOwner}
+          repo={item.repoName}
+          htmlUrl={item.htmlUrl}
+        />
+      )}
+
       {/* Footer Controls */}
       <div className="flex items-center justify-between pt-2 border-t border-border/60 text-xs">
         <div className="flex items-center gap-2">
@@ -175,6 +191,16 @@ export function TrackedIssueCard({
           >
             <FileText className="h-3 w-3" />
             <span>{item.notes ? "Edit Notes" : "+ Add Note"}</span>
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowBreakdown(!showBreakdown)}
+            className="h-7 text-xs text-cyan-400 hover:text-cyan-300 gap-1"
+          >
+            <Sparkles className="h-3 w-3" />
+            <span>{showBreakdown ? "Hide Breakdown" : "Breakdown & Skills"}</span>
           </Button>
 
           {item.status === "completed" && !item.isPrConfirmed && (
@@ -201,14 +227,34 @@ export function TrackedIssueCard({
             <ExternalLink className="h-3.5 w-3.5" />
           </a>
 
-          <button
-            type="button"
-            onClick={() => onRemove(item.id)}
-            className="p-1 rounded text-muted-foreground hover:text-destructive transition-colors"
-            title="Remove from Workspace"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
+          {confirmDelete ? (
+            <div className="flex items-center gap-1 animate-in fade-in">
+              <span className="text-[11px] text-destructive font-medium">Remove?</span>
+              <button
+                type="button"
+                onClick={() => onRemove(item.id)}
+                className="px-2 py-0.5 rounded text-[11px] font-semibold bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+              >
+                Yes
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(false)}
+                className="px-2 py-0.5 rounded text-[11px] border border-border hover:bg-muted transition-colors"
+              >
+                No
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setConfirmDelete(true)}
+              className="p-1 rounded text-muted-foreground hover:text-destructive transition-colors"
+              title="Remove from Workspace"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -3,7 +3,8 @@ import { z } from "zod";
 import { parseRepositoryUrl } from "@/lib/github/url-parser";
 import { GitHubApiError, GitHubClient } from "@/lib/github/client";
 import { getFallbackRepoPayload } from "@/lib/github/fallback-data";
-import { getServerAuthUser } from "@/lib/auth/session";
+import { resolveSessionOrGuest } from "@/lib/auth/guest-session";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limiter";
 import { prisma } from "@/lib/db/prisma";
 import { RepositoryAnalysisPayload } from "@/lib/github/types";
 
@@ -73,6 +74,15 @@ export async function POST(req: NextRequest) {
   let parsedRepo = "";
 
   try {
+    const ip = getClientIp(req);
+    const rateLimit = checkRateLimit(`analyze:${ip}`, 30, 60);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many analysis requests. Please wait a moment before trying again." },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const validation = analyzeRequestSchema.safeParse(body);
 
@@ -98,8 +108,8 @@ export async function POST(req: NextRequest) {
     parsedOwner = owner;
     parsedRepo = repo;
 
-    const authUser = await getServerAuthUser(req);
-    const userId = authUser ? authUser.id : "default-user";
+    const session = await resolveSessionOrGuest(req);
+    const userId = session.userId;
 
     const client = new GitHubClient();
 
@@ -110,17 +120,18 @@ export async function POST(req: NextRequest) {
     // Automatically persist analyzed data so user never loses it
     const savedId = await autoSaveAnalysis(analysis, userId);
 
-    return NextResponse.json({ ...analysis, savedAnalysisId: savedId }, { status: 200 });
+    const res = NextResponse.json({ ...analysis, savedAnalysisId: savedId }, { status: 200 });
+    return session.attachCookie(res);
   } catch (error: unknown) {
     if (error instanceof GitHubApiError) {
       if (error.isRateLimit && parsedOwner && parsedRepo) {
         // Provide immediate functional fallback so maintainers can test the UI without blocking
         const fallback = getFallbackRepoPayload(parsedOwner, parsedRepo);
-        const authUser = await getServerAuthUser(req);
-        const userId = authUser ? authUser.id : "default-user";
+        const session = await resolveSessionOrGuest(req);
+        const userId = session.userId;
         const savedId = await autoSaveAnalysis(fallback, userId);
 
-        return NextResponse.json(
+        const res = NextResponse.json(
           {
             ...fallback,
             savedAnalysisId: savedId,
@@ -130,6 +141,7 @@ export async function POST(req: NextRequest) {
           },
           { status: 200 }
         );
+        return session.attachCookie(res);
       }
 
       return NextResponse.json(

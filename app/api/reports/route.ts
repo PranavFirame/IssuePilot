@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db/prisma";
-import { getServerAuthUser } from "@/lib/auth/session";
+import { resolveSessionOrGuest } from "@/lib/auth/guest-session";
 
 const saveReportSchema = z.object({
   owner: z.string().min(1).max(100),
@@ -19,7 +19,8 @@ const saveReportSchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
-    const authUser = await getServerAuthUser(req);
+    const session = await resolveSessionOrGuest(req);
+    const userId = session.userId;
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -32,11 +33,16 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: "Saved report not found" }, { status: 404 });
       }
 
-      return NextResponse.json(report, { status: 200 });
+      // Allow viewing if it's user's own, default/public, or null
+      if (report.userId && report.userId !== userId && report.userId !== "default-user") {
+        return NextResponse.json({ error: "Forbidden: Access denied to this report" }, { status: 403 });
+      }
+
+      const res = NextResponse.json(report, { status: 200 });
+      return session.attachCookie(res);
     }
 
-    // List saved analyses for this user and default/public ones
-    const userId = authUser ? authUser.id : (searchParams.get("userId") || "default-user");
+    // List saved analyses for this user/guest and default/public ones
     const where: any = {
       OR: [{ userId }, { userId: "default-user" }, { userId: null }],
     };
@@ -63,7 +69,8 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(reports, { status: 200 });
+    const res = NextResponse.json(reports, { status: 200 });
+    return session.attachCookie(res);
   } catch (error: unknown) {
     return NextResponse.json(
       {
@@ -78,8 +85,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const authUser = await getServerAuthUser(req);
-    const userId = authUser ? authUser.id : "default-user";
+    const session = await resolveSessionOrGuest(req);
+    const userId = session.userId;
 
     const body = await req.json();
     const validation = saveReportSchema.safeParse(body);
@@ -150,7 +157,8 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ success: true, report: saved }, { status: 201 });
+    const res = NextResponse.json({ success: true, report: saved }, { status: 201 });
+    return session.attachCookie(res);
   } catch (error: unknown) {
     return NextResponse.json(
       {
@@ -165,7 +173,8 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const authUser = await getServerAuthUser(req);
+    const session = await resolveSessionOrGuest(req);
+    const userId = session.userId;
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -181,16 +190,17 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Report not found" }, { status: 404 });
     }
 
-    // Authorization check
-    if (authUser && existing.userId && existing.userId !== authUser.id && existing.userId !== "default-user") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    // Strict authorization check: must belong to the active session
+    if (existing.userId !== userId) {
+      return NextResponse.json({ error: "Forbidden: Cannot delete another user's report" }, { status: 403 });
     }
 
     await prisma.savedAnalysis.delete({
       where: { id },
     });
 
-    return NextResponse.json({ success: true, message: "Report deleted" }, { status: 200 });
+    const res = NextResponse.json({ success: true, message: "Report deleted" }, { status: 200 });
+    return session.attachCookie(res);
   } catch (error: unknown) {
     return NextResponse.json(
       {

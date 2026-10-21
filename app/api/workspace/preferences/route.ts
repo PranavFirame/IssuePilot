@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db/prisma";
-import { getServerAuthUser } from "@/lib/auth/session";
+import { resolveSessionOrGuest } from "@/lib/auth/guest-session";
 
 const preferencesSchema = z.object({
-  userId: z.string().optional(),
   languages: z.array(z.string()).default(["TypeScript", "JavaScript", "Python"]),
   experienceLevel: z.enum(["beginner", "intermediate", "advanced"]).default("beginner"),
   topics: z.array(z.string()).default(["web", "react", "tools"]),
@@ -13,9 +12,8 @@ const preferencesSchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
-    const authUser = await getServerAuthUser(req);
-    const { searchParams } = new URL(req.url);
-    const userId = authUser ? authUser.id : (searchParams.get("userId") || "default-user");
+    const session = await resolveSessionOrGuest(req);
+    const userId = session.userId;
 
     let pref = await prisma.userPreference.findUnique({
       where: { userId },
@@ -33,7 +31,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json(
+    const res = NextResponse.json(
       {
         userId: pref.userId,
         languages: JSON.parse(pref.languages),
@@ -43,6 +41,8 @@ export async function GET(req: NextRequest) {
       },
       { status: 200 }
     );
+
+    return session.attachCookie(res);
   } catch (error: unknown) {
     return NextResponse.json(
       { error: `Failed to fetch preferences: ${error instanceof Error ? error.message : String(error)}` },
@@ -53,7 +53,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const authUser = await getServerAuthUser(req);
+    const session = await resolveSessionOrGuest(req);
+    const userId = session.userId;
+
     const body = await req.json();
     const validation = preferencesSchema.safeParse(body);
 
@@ -64,8 +66,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { userId: bodyUserId, languages, experienceLevel, topics, monthlyGoal } = validation.data;
-    const userId = authUser ? authUser.id : (bodyUserId || "default-user");
+    const { languages, experienceLevel, topics, monthlyGoal } = validation.data;
 
     const updated = await prisma.userPreference.upsert({
       where: { userId },
@@ -84,7 +85,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(
+    const res = NextResponse.json(
       {
         success: true,
         preferences: {
@@ -97,6 +98,8 @@ export async function POST(req: NextRequest) {
       },
       { status: 200 }
     );
+
+    return session.attachCookie(res);
   } catch (error: unknown) {
     return NextResponse.json(
       { error: `Failed to update preferences: ${error instanceof Error ? error.message : String(error)}` },

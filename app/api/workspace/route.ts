@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db/prisma";
-import { getServerAuthUser } from "@/lib/auth/session";
+import { resolveSessionOrGuest } from "@/lib/auth/guest-session";
 
 const trackedIssueSchema = z.object({
-  userId: z.string().optional(),
   issueNumber: z.number().int().positive(),
   repoOwner: z.string().min(1).max(100),
   repoName: z.string().min(1).max(100),
@@ -28,12 +27,9 @@ const patchIssueSchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
-    const authUser = await getServerAuthUser(req);
+    const session = await resolveSessionOrGuest(req);
+    const userId = session.userId;
     const { searchParams } = new URL(req.url);
-
-    // If authenticated, strictly use their verified user ID.
-    // If unauthenticated, allow guest or query-specified unauthenticated ID.
-    const userId = authUser ? authUser.id : (searchParams.get("userId") || "default-user");
     const status = searchParams.get("status");
 
     const where: any = { userId };
@@ -53,7 +49,8 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    return NextResponse.json({ trackedIssues, recentlyViewed }, { status: 200 });
+    const res = NextResponse.json({ trackedIssues, recentlyViewed }, { status: 200 });
+    return session.attachCookie(res);
   } catch (error: unknown) {
     return NextResponse.json(
       { error: `Workspace API error: ${error instanceof Error ? error.message : String(error)}` },
@@ -64,15 +61,15 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const authUser = await getServerAuthUser(req);
+    const session = await resolveSessionOrGuest(req);
+    const userId = session.userId;
     const body = await req.json();
 
     // Check if recording recently viewed issue
     if (body.type === "record_view") {
-      const targetUserId = authUser ? authUser.id : (body.userId || "default-user");
       const record = await prisma.recentlyViewedIssue.create({
         data: {
-          userId: targetUserId,
+          userId,
           issueNumber: body.issueNumber,
           repoOwner: body.repoOwner,
           repoName: body.repoName,
@@ -81,7 +78,8 @@ export async function POST(req: NextRequest) {
           language: body.language || null,
         },
       });
-      return NextResponse.json({ success: true, record }, { status: 201 });
+      const res = NextResponse.json({ success: true, record }, { status: 201 });
+      return session.attachCookie(res);
     }
 
     const validation = trackedIssueSchema.safeParse(body);
@@ -93,29 +91,32 @@ export async function POST(req: NextRequest) {
     }
 
     const data = validation.data;
-    // CRITICAL: When authenticated, strictly bind to authenticated user ID.
-    // If unauthenticated, fallback to client-supplied guest ID or "default-user".
-    const targetUserId = authUser ? authUser.id : (data.userId || "default-user");
     const isPrConfirmed = Boolean(data.prUrl && /github\.com\/[^/]+\/[^/]+\/pull\/\d+/i.test(data.prUrl));
 
     const item = await prisma.trackedIssue.upsert({
       where: {
         userId_repoOwner_repoName_issueNumber: {
-          userId: targetUserId,
+          userId,
           repoOwner: data.repoOwner,
           repoName: data.repoName,
           issueNumber: data.issueNumber,
         },
       },
       update: {
+        title: data.title,
+        htmlUrl: data.htmlUrl,
+        state: data.state,
         status: data.status,
         notes: data.notes !== undefined ? data.notes : undefined,
-        prUrl: data.prUrl !== undefined ? data.prUrl : undefined,
+        labels: data.labels,
+        language: data.language || null,
+        difficulty: data.difficulty || null,
+        prUrl: data.prUrl || null,
         isPrConfirmed,
-        state: data.state,
+        updatedAt: new Date(),
       },
       create: {
-        userId: targetUserId,
+        userId,
         issueNumber: data.issueNumber,
         repoOwner: data.repoOwner,
         repoName: data.repoName,
@@ -132,7 +133,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true, item }, { status: 201 });
+    const res = NextResponse.json({ success: true, item }, { status: 201 });
+    return session.attachCookie(res);
   } catch (error: unknown) {
     return NextResponse.json(
       { error: `Failed to save tracked issue: ${error instanceof Error ? error.message : String(error)}` },
@@ -143,7 +145,8 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const authUser = await getServerAuthUser(req);
+    const session = await resolveSessionOrGuest(req);
+    const userId = session.userId;
     const body = await req.json();
     const validation = patchIssueSchema.safeParse(body);
 
@@ -162,23 +165,12 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Tracked issue not found" }, { status: 404 });
     }
 
-    // 2. Enforce strict authorization
-    if (authUser && existing.userId !== authUser.id) {
+    // 2. Strict authorization: item must belong to this user / guest session
+    if (existing.userId !== userId) {
       return NextResponse.json(
         { error: "Forbidden: You do not have permission to modify this issue" },
         { status: 403 }
       );
-    }
-
-    if (!authUser) {
-      // Check if the record belongs to a registered user
-      const ownerIsRegistered = await prisma.user.findUnique({ where: { id: existing.userId } });
-      if (ownerIsRegistered) {
-        return NextResponse.json(
-          { error: "Unauthorized: Sign in required to modify personal records" },
-          { status: 401 }
-        );
-      }
     }
 
     const updateData: any = {};
@@ -194,7 +186,8 @@ export async function PATCH(req: NextRequest) {
       data: updateData,
     });
 
-    return NextResponse.json({ success: true, item: updated }, { status: 200 });
+    const res = NextResponse.json({ success: true, item: updated }, { status: 200 });
+    return session.attachCookie(res);
   } catch (error: unknown) {
     return NextResponse.json(
       { error: `Failed to update tracked issue: ${error instanceof Error ? error.message : String(error)}` },
@@ -205,7 +198,8 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const authUser = await getServerAuthUser(req);
+    const session = await resolveSessionOrGuest(req);
+    const userId = session.userId;
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -218,27 +212,18 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Tracked issue not found" }, { status: 404 });
     }
 
-    // Enforce strict ownership
-    if (authUser && existing.userId !== authUser.id) {
+    // Strict authorization
+    if (existing.userId !== userId) {
       return NextResponse.json(
         { error: "Forbidden: You do not have permission to delete this issue" },
         { status: 403 }
       );
     }
 
-    if (!authUser) {
-      const ownerIsRegistered = await prisma.user.findUnique({ where: { id: existing.userId } });
-      if (ownerIsRegistered) {
-        return NextResponse.json(
-          { error: "Unauthorized: Sign in required to delete personal records" },
-          { status: 401 }
-        );
-      }
-    }
-
     await prisma.trackedIssue.delete({ where: { id } });
 
-    return NextResponse.json({ success: true, message: "Issue removed from workspace" }, { status: 200 });
+    const res = NextResponse.json({ success: true, message: "Issue removed from workspace" }, { status: 200 });
+    return session.attachCookie(res);
   } catch (error: unknown) {
     return NextResponse.json(
       { error: `Failed to remove tracked issue: ${error instanceof Error ? error.message : String(error)}` },

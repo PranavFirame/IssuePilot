@@ -46,6 +46,7 @@ import { NotesModal } from "@/components/workspace/notes-modal";
 import { LinkPrModal } from "@/components/workspace/link-pr-modal";
 import { AiTriageModal } from "@/components/triage/ai-triage-modal";
 import { SavedReportsModal } from "@/components/reports/saved-reports-modal";
+import { OnboardingModal } from "@/components/workspace/onboarding-modal";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatNumber } from "@/lib/utils";
 
@@ -77,6 +78,7 @@ function WorkspaceContent() {
   const [linkingPrItem, setLinkingPrItem] = React.useState<ClientTrackedIssue | null>(null);
   const [selectedIssueForTriage, setSelectedIssueForTriage] = React.useState<NormalizedIssue | null>(null);
   const [isSavedReportsOpen, setIsSavedReportsOpen] = React.useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = React.useState(false);
 
   const loadWorkspaceData = React.useCallback(async () => {
     setIsLoading(true);
@@ -274,12 +276,20 @@ function WorkspaceContent() {
           </div>
 
           <div className="flex items-center gap-2 self-stretch sm:self-auto justify-end">
+            <button
+              type="button"
+              onClick={() => setIsOnboardingOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-primary/40 bg-primary/10 hover:bg-primary/20 text-xs font-semibold text-primary transition-colors"
+            >
+              <Sliders className="h-3.5 w-3.5" />
+              <span>Calibrate Stack</span>
+            </button>
             <Link
               href="/profile"
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border/80 bg-background/50 hover:bg-accent text-xs font-semibold text-foreground transition-colors"
             >
-              <Sliders className="h-3.5 w-3.5 text-primary" />
-              <span>Edit Preferences</span>
+              <User className="h-3.5 w-3.5 text-muted-foreground" />
+              <span>Profile</span>
             </Link>
             <Link
               href="/explore"
@@ -493,6 +503,7 @@ function WorkspaceContent() {
             trackedIssues={trackedIssues}
             onTrackIssue={handleTrackIssueFromRecommendations}
             onTriageIssue={handleOpenTriage}
+            onOpenCalibration={() => setIsOnboardingOpen(true)}
           />
         )}
 
@@ -752,6 +763,14 @@ function WorkspaceContent() {
       <SavedReportsModal
         isOpen={isSavedReportsOpen}
         onClose={() => setIsSavedReportsOpen(false)}
+      />
+
+      {/* Onboarding & Calibration Modal */}
+      <OnboardingModal
+        isOpen={isOnboardingOpen}
+        onClose={() => setIsOnboardingOpen(false)}
+        currentPreferences={preferences}
+        onSavePreferences={(updated) => setPreferences(updated)}
       />
     </div>
   );

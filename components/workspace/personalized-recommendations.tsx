@@ -14,6 +14,7 @@ interface PersonalizedRecommendationsProps {
   trackedIssues: ClientTrackedIssue[];
   onTrackIssue: (issue: BeginnerIssue, status: "saved" | "interested" | "in_progress" | "completed") => void;
   onTriageIssue: (issue: BeginnerIssue) => void;
+  onOpenCalibration?: () => void;
 }
 
 export function PersonalizedRecommendations({
@@ -21,6 +22,7 @@ export function PersonalizedRecommendations({
   trackedIssues,
   onTrackIssue,
   onTriageIssue,
+  onOpenCalibration,
 }: PersonalizedRecommendationsProps) {
   const [issues, setIssues] = React.useState<BeginnerIssue[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -102,13 +104,24 @@ export function PersonalizedRecommendations({
           Try expanding your preferred languages or updating your experience level in your profile settings.
         </p>
         <div className="pt-2 flex items-center justify-center gap-2">
-          <Link
-            href="/profile"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors"
-          >
-            <Sliders className="h-3.5 w-3.5" />
-            <span>Customize Tech Stack</span>
-          </Link>
+          {onOpenCalibration ? (
+            <button
+              type="button"
+              onClick={onOpenCalibration}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors"
+            >
+              <Sliders className="h-3.5 w-3.5" />
+              <span>Calibrate Tech Stack</span>
+            </button>
+          ) : (
+            <Link
+              href="/profile"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors"
+            >
+              <Sliders className="h-3.5 w-3.5" />
+              <span>Customize Tech Stack</span>
+            </Link>
+          )}
           <Link
             href="/explore"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-foreground hover:bg-accent transition-colors"
@@ -134,13 +147,24 @@ export function PersonalizedRecommendations({
             • Level: <span className="capitalize font-bold text-primary">{preferences.experienceLevel}</span>
           </span>
         </div>
-        <Link
-          href="/profile"
-          className="text-primary hover:underline font-semibold inline-flex items-center gap-1 shrink-0"
-        >
-          <span>Adjust preferences</span>
-          <ArrowRight className="h-3 w-3" />
-        </Link>
+        {onOpenCalibration ? (
+          <button
+            type="button"
+            onClick={onOpenCalibration}
+            className="text-primary hover:underline font-semibold inline-flex items-center gap-1 shrink-0"
+          >
+            <Sliders className="h-3 w-3" />
+            <span>Calibrate preferences</span>
+          </button>
+        ) : (
+          <Link
+            href="/profile"
+            className="text-primary hover:underline font-semibold inline-flex items-center gap-1 shrink-0"
+          >
+            <span>Adjust preferences</span>
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        )}
       </div>
 
       {/* Scored Issue Cards */}

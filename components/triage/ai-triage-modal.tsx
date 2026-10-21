@@ -32,16 +32,7 @@ export function AiTriageModal({ issue, repoFullName, isOpen, onClose }: AiTriage
   const [error, setError] = React.useState<string | null>(null);
   const [copiedLabels, setCopiedLabels] = React.useState(false);
 
-  React.useEffect(() => {
-    if (isOpen && issue) {
-      performTriage();
-    } else {
-      setResult(null);
-      setError(null);
-    }
-  }, [isOpen, issue?.number]);
-
-  const performTriage = async () => {
+  const performTriage = React.useCallback(async () => {
     if (!issue) return;
     setIsLoading(true);
     setError(null);
@@ -76,7 +67,16 @@ export function AiTriageModal({ issue, repoFullName, isOpen, onClose }: AiTriage
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [issue, repoFullName]);
+
+  React.useEffect(() => {
+    if (isOpen && issue) {
+      performTriage();
+    } else {
+      setResult(null);
+      setError(null);
+    }
+  }, [isOpen, issue, performTriage]);
 
   const handleCopyLabels = () => {
     if (!result?.suggestedLabels) return;

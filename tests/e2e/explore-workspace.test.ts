@@ -7,16 +7,22 @@ import {
   POST as postWorkspaceHandler,
 } from "../../app/api/workspace/route";
 import { NextRequest } from "next/server";
+import { generateGuestId, GUEST_COOKIE_NAME } from "@/lib/auth/guest-session";
 
 describe("Explore & Workspace Full Integration", () => {
-  const testUserId = "test-user-e2e-" + Date.now();
+  const testGuestId = generateGuestId();
+  const testHeaders = {
+    "Content-Type": "application/json",
+    cookie: `${GUEST_COOKIE_NAME}=${testGuestId}`,
+  };
+
   let trackedItemId: string;
 
   it("saves and retrieves user preferences", async () => {
     const postReq = new NextRequest("http://localhost:3000/api/workspace/preferences", {
       method: "POST",
+      headers: testHeaders,
       body: JSON.stringify({
-        userId: testUserId,
         languages: ["Rust", "TypeScript"],
         experienceLevel: "beginner",
         topics: ["cli", "compiler"],
@@ -32,8 +38,9 @@ describe("Explore & Workspace Full Integration", () => {
     expect(postJson.preferences.monthlyGoal).toBe(5);
 
     // Retrieve
-    const getReq = new NextRequest(`http://localhost:3000/api/workspace/preferences?userId=${testUserId}`, {
+    const getReq = new NextRequest("http://localhost:3000/api/workspace/preferences", {
       method: "GET",
+      headers: testHeaders,
     });
     const getRes = await getPreferencesHandler(getReq);
     expect(getRes.status).toBe(200);
@@ -44,8 +51,8 @@ describe("Explore & Workspace Full Integration", () => {
   it("tracks an issue into workspace and records notes", async () => {
     const req = new NextRequest("http://localhost:3000/api/workspace", {
       method: "POST",
+      headers: testHeaders,
       body: JSON.stringify({
-        userId: testUserId,
         issueNumber: 101,
         repoOwner: "test-org",
         repoName: "test-repo",
@@ -74,6 +81,7 @@ describe("Explore & Workspace Full Integration", () => {
     // 1. Move to in_progress
     const patchReq1 = new NextRequest("http://localhost:3000/api/workspace", {
       method: "PATCH",
+      headers: testHeaders,
       body: JSON.stringify({
         id: trackedItemId,
         status: "in_progress",
@@ -89,6 +97,7 @@ describe("Explore & Workspace Full Integration", () => {
     const prUrl = "https://github.com/test-org/test-repo/pull/105";
     const patchReq2 = new NextRequest("http://localhost:3000/api/workspace", {
       method: "PATCH",
+      headers: testHeaders,
       body: JSON.stringify({
         id: trackedItemId,
         status: "completed",
@@ -104,8 +113,9 @@ describe("Explore & Workspace Full Integration", () => {
   });
 
   it("retrieves tracked issues for user", async () => {
-    const req = new NextRequest(`http://localhost:3000/api/workspace?userId=${testUserId}`, {
+    const req = new NextRequest("http://localhost:3000/api/workspace", {
       method: "GET",
+      headers: testHeaders,
     });
     const res = await getWorkspaceHandler(req);
     expect(res.status).toBe(200);
@@ -118,6 +128,7 @@ describe("Explore & Workspace Full Integration", () => {
     expect(trackedItemId).toBeDefined();
     const req = new NextRequest(`http://localhost:3000/api/workspace?id=${trackedItemId}`, {
       method: "DELETE",
+      headers: testHeaders,
     });
     const res = await deleteWorkspaceHandler(req);
     expect(res.status).toBe(200);

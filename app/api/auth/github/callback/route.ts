@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { createSession, setSessionCookie } from "@/lib/auth/session";
+import { extractGuestId } from "@/lib/auth/guest-session";
+import { migrateGuestData } from "@/lib/auth/guest-migration";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -177,6 +179,13 @@ export async function GET(req: NextRequest) {
     const res = NextResponse.redirect(new URL(redirectTarget, req.url));
     setSessionCookie(sessionToken, expiresAt, res);
     clearOAuthCookies(res);
+
+    // Safely migrate any guest data the visitor created before signing in via GitHub
+    const guestId = extractGuestId(req);
+    if (guestId) {
+      await migrateGuestData(guestId, user.id, res);
+    }
+
     return res;
   } catch (error: unknown) {
     signinUrl.searchParams.set("error", "oauth_unexpected_error");

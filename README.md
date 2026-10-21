@@ -12,53 +12,89 @@ IssuePilot is a production-grade developer platform designed for open-source mai
 
 ---
 
+## Architecture Overview
+
+```
+                      ┌─────────────────────────────────────────┐
+                      │            Client Browser               │
+                      │  Next.js 15 App Router (React 19)       │
+                      └────────────────────┬────────────────────┘
+                                           │
+                        HTTPS / HTTPOnly Secure Cookies
+                        (Session Token / Isolated Guest Token)
+                                           │
+                                           ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           IssuePilot Core API Layer                             │
+│                                                                                 │
+│   ┌─────────────────────┐   ┌───────────────────────┐   ┌───────────────────┐   │
+│   │  Session & Identity │   │  Sliding-Window Rate  │   │  Input Validation │   │
+│   │  Resolver / Guest   │   │  Limiter (In-Memory)  │   │  & SSRF Firewall  │   │
+│   └──────────┬──────────┘   └───────────┬───────────┘   └─────────┬─────────┘   │
+│              │                          │                         │             │
+│              └──────────────────────────┼─────────────────────────┘             │
+│                                         ▼                                       │
+│                       ┌───────────────────────────────────┐                     │
+│                       │    Service & Intelligence Logic   │                     │
+│                       ├───────────────────────────────────┤                     │
+│                       │ • Health Scoring Engine (A+ to F) │                     │
+│                       │ • TF-IDF Duplicate Issue Radar    │                     │
+│                       │ • Explainable Recommendation Match│                     │
+│                       │ • Guest-to-Account Data Migration │                     │
+│                       │ • Issue Skills & Breakdown Parser │                     │
+│                       └─────────────────┬─────────────────┘                     │
+└─────────────────────────────────────────┼───────────────────────────────────────┘
+                                          │
+                     ┌────────────────────┴────────────────────┐
+                     ▼                                         ▼
+         ┌───────────────────────┐                 ┌───────────────────────┐
+         │     Prisma SQLite     │                 │    GitHub REST API    │
+         │  Strict Tenant Guard  │                 │    Read-Only Client   │
+         │  (Users/Tracks/Prefs) │                 │ (Issues/PRs/Telemetry)│
+         └───────────────────────┘                 └───────────────────────┘
+```
+
+---
+
 ## Key Features
 
-1. **Production-Ready Authentication & Sessions**:
-   - Secure email & password authentication with `scrypt` hashing, random salts, and constant-time comparison.
-   - One-click GitHub OAuth 2.0 integration requesting only minimal read permissions (`read:user user:email`).
-   - High-entropy cryptographic session tokens stored in secure, `httpOnly`, `SameSite=Lax` cookies.
-   - Built-in email verification and password reset workflows.
-   - Public exploration remains 100% accessible without sign-in; authentication is required only for personal saved data.
+1. **Hardened Security & Isolated Guest Sessions**:
+   - **Zero-Shared Identity Fallbacks**: No shared identities. Every unauthenticated visitor receives a cryptographically generated, isolated guest identity (`issuepilot_guest_id`) stored in a secure `httpOnly` cookie.
+   - **Server-Side Authorization**: Client-supplied user IDs are strictly rejected as proof of identity; requests query only verified user sessions or the caller's verified guest cookie.
+   - **Cross-Tenant Protection**: Strict tenant isolation prevents User A or Guest A from viewing, editing, or deleting User B's or Guest B's tracked issues, notes, or preferences (enforcing 403 Forbidden).
+   - **In-Memory Rate Limiting**: Sliding-window rate limiters protect authentication endpoints (`/api/auth/login`, `/api/auth/register`) and upstream GitHub fetch routes (`/api/analyze`) against brute-force and DoS attacks.
+   - **SSRF Defense**: Domain-enforced repository parser restricting outgoing HTTP traffic exclusively to `api.github.com`.
 
-2. **Personal Contributor Profile & Settings (`/profile`)**:
-   - Clear visual distinction between verified GitHub profile data and user-entered details.
-   - Editable display name, bio (up to 500 characters), and custom avatar URL.
-   - Preferred programming languages, focus topics/frameworks, and experience level calibrator.
-   - Complete data sovereignty: single-click workspace data purge and permanent account deletion.
+2. **Idempotent Guest-to-Account Migration (`/api/auth/migrate-guest`)**:
+   - Seamlessly transfers all guest-saved issues, private implementation notes, repository snapshots, and technology preferences into a newly registered or authenticated account upon sign-in.
+   - Handles collisions atomically without duplicate records or unique constraint crashes, and automatically purges old guest records.
 
-3. **Personalized Contributor Dashboard (`/workspace`)**:
-   - Multi-tab intelligence hub:
-     - **Tracked Issues**: Filter by Saved, Interested, In Progress, and Completed.
-     - **Personalized Recommendations**: Issues dynamically scored against your chosen tech stack and experience level with transparent match explanations.
-     - **Recently Viewed**: Automatic history of inspected issues.
-     - **Goals & Progress**: Monthly contribution target trackers and verified pull request badges.
-   - Implementation notes modal and verified PR URL linking (`https://github.com/owner/repo/pull/123`).
+3. **Contributor Onboarding & Tech Stack Calibration (`/workspace`)**:
+   - Interactive modal to calibrate programming languages, experience level (Beginner, Intermediate, Advanced), focus topics, and monthly contribution targets.
+   - Dynamic recalibration button in the contributor workspace dashboard with real-time recalculation of recommendation scores.
 
-4. **Beginner Issue Discovery Hub (`/explore`)**:
+4. **Issue-to-Contribution Journey & Skill Breakdown**:
+   - **Explainable Objective Breakdown**: Plain-language translation of what each issue is asking for.
+   - **Heuristic Skill Tagging**: Detects required skills (e.g. React components, TypeScript types, CSS styling, async APIs, unit testing) from issue labels, titles, and body content without false AI certainty.
+   - **Contribution Guide Shortcuts**: Direct links to repository `CONTRIBUTING.md` and upstream GitHub tickets.
+   - **Contribution Tracker**: Lightweight status progression (`Saved` → `Interested` → `In Progress` → `Completed`) with private notes and verified pull request URL attachment (`https://github.com/owner/repo/pull/123`).
+
+5. **Beginner Issue Discovery Hub (`/explore`)**:
    - Curates open starter issues tagged `good first issue`, `help wanted`, and `documentation`.
-   - Filter by language (TypeScript, Python, Rust, Go, Java, C++, etc.), difficulty, and sorting.
-   - URL-synchronized state for shareable, bookmarkable queries.
+   - Filter by language, difficulty, and sorting with shareable, bookmarkable URL queries.
 
-5. **Repository Health & Staleness Scoring (`/repo/[owner]/[name]`)**:
+6. **Repository Health & Staleness Scoring (`/repo/[owner]/[name]`)**:
    - Multi-factor health grade (**A+ through F**) and numerical score (0–100) based on push velocity, issue closure ratios, stale backlog volume (>90 days inactive), and pull request turnover.
-   - Backlog freshness indicators and average/median ticket age.
+   - Diagnostic counters for median backlog age, stale issue counts, and PR turnover velocity.
 
-6. **Deterministic Duplicate Radar**:
+7. **Deterministic Duplicate Radar**:
    - TF-IDF and weighted token cosine similarity vectorizer.
    - Boosts titles with 3x weight, pairs potential duplicate tickets with similarity scores, and highlights shared keywords.
 
-7. **AI-Assisted Issue Triage**:
+8. **AI-Assisted Issue Triage**:
    - Classifies tickets into bug, feature, docs, question, or enhancement.
    - Recommends priority with clear reasoning and suggested labels.
    - **Zero-Crash Fallback**: If no AI key is configured, all analysis, health scores, duplicate detection, and exports continue functioning without errors.
-
-8. **Hardened Security Architecture**:
-   - **Server-Side Authorization**: API routes strictly verify ownership from session cookies; client-supplied user IDs are never trusted as proof of authorization.
-   - **Cross-Tenant Isolation**: Users cannot read, modify, or delete another user's private notes or bookmarks.
-   - **SSRF Defense**: Strict regex validation of repository names (`^[a-zA-Z0-9_.-]+$`), restricting outgoing calls solely to `api.github.com`.
-   - **Prompt Injection Boundaries**: Issue content is isolated inside XML fences with system constraints.
-   - **Read-Only Principles**: Zero write operations are ever requested against user GitHub repositories.
 
 ---
 
@@ -82,6 +118,27 @@ To enable one-click GitHub login:
    GITHUB_CLIENT_SECRET=your_client_secret_here
    ```
 *If not configured, IssuePilot displays clear in-app guidance and directs users to email/password sign-in.*
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+# Database
+DATABASE_URL="file:./dev.db"
+
+# GitHub API Token (Optional: Increases rate limit from 60 to 5,000 req/hr)
+GITHUB_TOKEN=
+
+# GitHub OAuth App Credentials (Optional: Enables 1-click GitHub Sign-In)
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+
+# AI Provider Key (Optional: Enables AI Backlog Triage. Has zero-crash fallback)
+GEMINI_API_KEY=
+```
 
 ---
 
@@ -113,24 +170,25 @@ Visit [http://localhost:3000](http://localhost:3000) to use IssuePilot.
 
 ---
 
-## Running the Automated Test Suite
+## Verification & Test Suite
 
-IssuePilot includes unit, integration, and end-to-end tests covering cryptography, database relations, API route handlers, and multi-tenant authorization:
+IssuePilot features 72 automated unit, integration, security, and end-to-end tests:
 
 ```bash
-# Run all tests
+# Run the full Vitest suite (72 tests across 16 files)
 npm test
 
-# Run tests in watch mode
-npm run test:watch
+# Run TypeScript typecheck
+npx tsc --noEmit
+
+# Run Next.js production build
+npm run build
 ```
 
----
-
-## Technology Stack
-
-- **Framework**: Next.js 15 (App Router), React 19, TypeScript
-- **Styling**: Tailwind CSS (inspired by rubens.design dark indigo theme, Inter typography)
-- **Database & ORM**: SQLite (`dev.db`) with Prisma ORM
-- **Authentication**: Native Node.js `crypto` (`scrypt`, `timingSafeEqual`), httpOnly cookies, GitHub OAuth
-- **Testing**: Vitest 3.0
+### Verified Test Categories:
+- **Security & Guest Session Isolation**: Proves two separate unauthenticated visitors receive isolated data and cannot mutate or view each other's tracked issues.
+- **Cross-Tenant Authorization**: Verifies User B receives 403 Forbidden attempting to read, update, or delete User A's private records.
+- **Guest-to-Account Migration**: Proves all guest-created items transfer safely and idempotently to user accounts upon sign-in.
+- **Sliding-Window Rate Limiting**: Proves in-memory rate limiter stops abusive traffic after exceeding request quotas.
+- **Deterministic Health & Duplicates**: Unit-tested TF-IDF cosine similarity calculations and 4-factor health grading rubric.
+- **Cryptographic Security**: Salted `scrypt` hashing, constant-time equality checks, and session expiration handling.

@@ -54,6 +54,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Ignore network errors on logout
     } finally {
       setUser(null);
+      try {
+        localStorage.removeItem("issuepilot_tracked_issues_v1");
+        localStorage.removeItem("issuepilot_user_preferences_v1");
+        localStorage.removeItem("issuepilot_recent_views_v1");
+      } catch {}
       window.location.href = "/";
     }
   }, []);

@@ -18,6 +18,7 @@ import { DifficultyBadge } from "./difficulty-badge";
 import { FreshnessIndicator } from "../dashboard/freshness-indicator";
 import { MatchReasonBadge } from "../recommendations/match-reason-badge";
 import { RecommendationMatch } from "@/lib/recommendations/matcher";
+import { IssueBreakdown } from "./issue-breakdown";
 import { Button } from "../ui/button";
 import { formatDate, formatNumber } from "@/lib/utils";
 
@@ -42,6 +43,7 @@ export function BeginnerIssueCard({
   onTriageIssue,
 }: BeginnerIssueCardProps) {
   const [showStatusMenu, setShowStatusMenu] = React.useState(false);
+  const [showBreakdown, setShowBreakdown] = React.useState(false);
 
   const getStatusLabel = (status?: string) => {
     switch (status) {
@@ -150,6 +152,19 @@ export function BeginnerIssueCard({
         </div>
       )}
 
+      {/* Expandable Issue Breakdown */}
+      {showBreakdown && (
+        <IssueBreakdown
+          title={issue.title}
+          body={issue.body}
+          labels={issue.labels.map((l) => l.name)}
+          language={issue.repository.language}
+          owner={issue.repository.owner}
+          repo={issue.repository.name}
+          htmlUrl={issue.htmlUrl}
+        />
+      )}
+
       {/* Footer Actions */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border/60 text-xs">
         <div className="flex items-center gap-3 text-muted-foreground text-[11px]">
@@ -158,6 +173,14 @@ export function BeginnerIssueCard({
             <MessageSquare className="h-3 w-3" />
             {issue.commentsCount}
           </span>
+          <button
+            type="button"
+            onClick={() => setShowBreakdown(!showBreakdown)}
+            className="text-cyan-400 hover:underline flex items-center gap-1 font-medium"
+          >
+            <Sparkles className="h-3 w-3" />
+            <span>{showBreakdown ? "Hide Breakdown" : "Skills & Breakdown"}</span>
+          </button>
         </div>
 
         <div className="flex items-center gap-2">
