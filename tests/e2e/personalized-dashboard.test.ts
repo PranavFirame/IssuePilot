@@ -69,7 +69,6 @@ describe("Personalized Dashboard & Recommendation Engine", () => {
         owner: "rust-lang",
         name: "cli",
         fullName: "rust-lang/cli",
-        description: "Official CLI tool",
         stars: 1200,
         language: "Rust",
         htmlUrl: "https://github.com/rust-lang/cli",

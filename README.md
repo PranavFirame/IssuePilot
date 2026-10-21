@@ -1,7 +1,7 @@
 # IssuePilot 🧭
 ### AI-Powered GitHub Issue Triage and Repository Intelligence Platform
 
-IssuePilot is a production-grade developer platform designed for open-source maintainers, software engineering teams, and developers to analyze public GitHub repositories, evaluate repository health, detect duplicate tickets with deterministic NLP, and triage incoming backlog items with structured AI models.
+IssuePilot is a production-grade developer platform designed for open-source maintainers, software engineering teams, and developers to discover beginner-friendly issues, analyze public GitHub repositories, evaluate repository health, detect duplicate tickets with deterministic NLP, and personalize their open-source contribution journey.
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?logo=typescript)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)
@@ -14,174 +14,123 @@ IssuePilot is a production-grade developer platform designed for open-source mai
 
 ## Key Features
 
-1. **Beginner Issue Discovery Hub (`/explore`)**:
-   - Curates open issues tagged `good first issue`, `help wanted`, `beginner`, and `documentation` across active GitHub repositories.
-   - Filter by language (TypeScript, Python, Rust, Go, Java, C++, etc.), difficulty level, and sorting.
-   - Filter state is synchronized with URL search params for shareable and refresh-resilient queries.
+1. **Production-Ready Authentication & Sessions**:
+   - Secure email & password authentication with `scrypt` hashing, random salts, and constant-time comparison.
+   - One-click GitHub OAuth 2.0 integration requesting only minimal read permissions (`read:user user:email`).
+   - High-entropy cryptographic session tokens stored in secure, `httpOnly`, `SameSite=Lax` cookies.
+   - Built-in email verification and password reset workflows.
+   - Public exploration remains 100% accessible without sign-in; authentication is required only for personal saved data.
 
-2. **Personal Contributor Workspace & Kanban (`/workspace`)**:
-   - Track issues into four lifecycle stages: **Saved**, **Interested**, **In Progress**, and **Completed**.
-   - Attach personal implementation notes to any tracked issue.
-   - Synchronized with Prisma SQLite/PostgreSQL storage and resilient `localStorage` caching for zero-setup unauthenticated browsing.
+2. **Personal Contributor Profile & Settings (`/profile`)**:
+   - Clear visual distinction between verified GitHub profile data and user-entered details.
+   - Editable display name, bio (up to 500 characters), and custom avatar URL.
+   - Preferred programming languages, focus topics/frameworks, and experience level calibrator.
+   - Complete data sovereignty: single-click workspace data purge and permanent account deletion.
 
-3. **Transparent Relevance Recommendations**:
-   - Set programming languages, frameworks, topics, and experience level in the Recommendation Preferences profile.
-   - Computes transparent, explainable match percentages (0–100%) with exact breakdown reasons.
-   - Zero false pretenses: Heuristic scores are clearly labeled and never disguised as AI certainty.
+3. **Personalized Contributor Dashboard (`/workspace`)**:
+   - Multi-tab intelligence hub:
+     - **Tracked Issues**: Filter by Saved, Interested, In Progress, and Completed.
+     - **Personalized Recommendations**: Issues dynamically scored against your chosen tech stack and experience level with transparent match explanations.
+     - **Recently Viewed**: Automatic history of inspected issues.
+     - **Goals & Progress**: Monthly contribution target trackers and verified pull request badges.
+   - Implementation notes modal and verified PR URL linking (`https://github.com/owner/repo/pull/123`).
 
-4. **Personal Contribution Progress & PR Verification**:
-   - Lightweight contribution counter and customizable monthly target goals.
-   - Attach GitHub Pull Request URLs (`https://github.com/owner/repo/pull/123`) to completed issues.
-   - Visually distinguishes manually marked completions from confirmed pull requests.
+4. **Beginner Issue Discovery Hub (`/explore`)**:
+   - Curates open starter issues tagged `good first issue`, `help wanted`, and `documentation`.
+   - Filter by language (TypeScript, Python, Rust, Go, Java, C++, etc.), difficulty, and sorting.
+   - URL-synchronized state for shareable, bookmarkable queries.
 
-5. **Repository Health & Staleness Scoring**:
-   - Calculates a multi-factor health grade (**A+ through F**) and numerical score (0–100) based on push velocity, issue closure ratios, stale backlog volume (>90 days inactive), and pull request turnover.
-   - Computes average and median backlog age in days.
+5. **Repository Health & Staleness Scoring (`/repo/[owner]/[name]`)**:
+   - Multi-factor health grade (**A+ through F**) and numerical score (0–100) based on push velocity, issue closure ratios, stale backlog volume (>90 days inactive), and pull request turnover.
+   - Backlog freshness indicators and average/median ticket age.
 
-6. **Duplicate Issue Radar**:
-   - Deterministic Term Frequency–Inverse Document Frequency (TF-IDF) and weighted token cosine similarity vectorizer.
-   - Boosts titles with 3x weight, pairs potential duplicate issues with similarity percentage scores, highlights shared keywords, and provides direct links to inspect issues on GitHub.
+6. **Deterministic Duplicate Radar**:
+   - TF-IDF and weighted token cosine similarity vectorizer.
+   - Boosts titles with 3x weight, pairs potential duplicate tickets with similarity scores, and highlights shared keywords.
 
 7. **AI-Assisted Issue Triage**:
-   - Classifies issues into `bug`, `feature`, `documentation`, `question`, `enhancement`, or `performance`.
-   - Recommends priority (`critical`, `high`, `medium`, `low`) with transparent reasoning.
-   - Identifies missing information (reproduction steps, environment details, logs).
-   - Generates suggested labels with one-click copying.
-   - **Zero-Crash Degradation**: If no AI key is configured, all repository analysis, duplicate detection, health scoring, and export tools continue working seamlessly.
+   - Classifies tickets into bug, feature, docs, question, or enhancement.
+   - Recommends priority with clear reasoning and suggested labels.
+   - **Zero-Crash Fallback**: If no AI key is configured, all analysis, health scores, duplicate detection, and exports continue functioning without errors.
 
-8. **Export & Persistence**:
-   - One-click RFC-4180 compliant CSV issue backlog exports.
-   - Comprehensive Markdown intelligence reports formatted for team reviews.
-   - Save and manage repository snapshots via Prisma ORM (SQLite for zero-setup local dev/test; PostgreSQL with Docker Compose for production).
-
-9. **Hardened Security**:
-   - **SSRF Defense**: Strict regex validation of owner and repository names (`^[a-zA-Z0-9_.-]+$`), restricting outgoing requests solely to `api.github.com`.
-   - **Prompt Injection Defense**: Issue titles and descriptions are wrapped in strict `<untrusted_issue_data>` XML fences with explicit system directives preventing prompt hijacking.
-   - **Read-Only**: Zero write operations or destructive actions to GitHub repositories.
+8. **Hardened Security Architecture**:
+   - **Server-Side Authorization**: API routes strictly verify ownership from session cookies; client-supplied user IDs are never trusted as proof of authorization.
+   - **Cross-Tenant Isolation**: Users cannot read, modify, or delete another user's private notes or bookmarks.
+   - **SSRF Defense**: Strict regex validation of repository names (`^[a-zA-Z0-9_.-]+$`), restricting outgoing calls solely to `api.github.com`.
+   - **Prompt Injection Boundaries**: Issue content is isolated inside XML fences with system constraints.
+   - **Read-Only Principles**: Zero write operations are ever requested against user GitHub repositories.
 
 ---
 
-## Architecture Overview
+## Authentication Setup & Configuration
 
-```
-                      +-----------------------------+
-                      |         Web Client          |
-                      | Next.js App Router (React)  |
-                      +--------------+--------------+
-                                     |
-                                     v
-                      +-----------------------------+
-                      |      Route Handlers         |
-                      |  /api/analyze, /api/triage  |
-                      |        /api/reports         |
-                      +---+----------+----------+---+
-                          |          |          |
-            +-------------+          |          +------------+
-            v                        v                       v
-+-----------------------+ +--------------------+ +----------------------+
-|     GitHub Client     | | AI Triage Service  | |   Prisma ORM Layer   |
-| - SSRF URL Validator  | | - Gemini 1.5 Flash | | - SQLite (Dev/Test)  |
-| - Rate-Limit Tracker  | | - OpenAI GPT-4o    | | - PostgreSQL (Prod)  |
-| - In-Memory Cache     | | - Schema Validator | | - Saved Analyses     |
-| - Issues Normalizer   | | - Injection Guard  | | - Triage Snapshots   |
-+-----------------------+ +--------------------+ +----------------------+
-            |                        |                       |
-            v                        v                       v
-  GitHub REST API v3       Google AI / OpenAI API     Database Container
-```
+### 1. Email & Password Authentication (Ready Out of the Box)
+Email authentication functions immediately with zero external service configuration. Passwords are encrypted using native Node.js `scrypt` hashing with unique cryptographic salts.
 
-For complete architectural details, see [docs/architecture.md](docs/architecture.md).
+### 2. GitHub OAuth (Optional)
+To enable one-click GitHub login:
+1. Navigate to [GitHub Developer Settings → OAuth Apps](https://github.com/settings/developers).
+2. Click **New OAuth App**.
+3. Fill in:
+   - **Application Name**: `IssuePilot`
+   - **Homepage URL**: `http://localhost:3000`
+   - **Authorization callback URL**: `http://localhost:3000/api/auth/github/callback`
+4. Copy the **Client ID** and generate a **Client Secret**.
+5. Add them to your `.env` file:
+   ```env
+   GITHUB_CLIENT_ID=your_client_id_here
+   GITHUB_CLIENT_SECRET=your_client_secret_here
+   ```
+*If not configured, IssuePilot displays clear in-app guidance and directs users to email/password sign-in.*
 
 ---
 
-## Quick Start & Installation
+## Quick Start
 
 ### Prerequisites
-- Node.js 18.x or 20+ (tested on Node v20/v24)
-- npm 9+
+- Node.js 18+ (tested on Node 20 & 24)
+- npm or pnpm
 
-### 1. Clone & Install Dependencies
+### Installation
+
 ```bash
-git clone https://github.com/your-org/issuepilot.git
-cd issuepilot
+# Clone the repository
+git clone https://github.com/PranavFirame/IssuePilot.git
+cd IssuePilot
+
+# Install dependencies
 npm install
-```
 
-### 2. Configure Environment Variables
-Copy `.env.example` to `.env`:
-```bash
-cp .env.example .env
-```
-
-| Variable | Description | Default |
-|---|---|---|
-| `NEXT_PUBLIC_APP_URL` | Base application URL | `http://localhost:3000` |
-| `GITHUB_TOKEN` | Optional GitHub Personal Access Token (raises rate limit from 60 to 5,000 req/hr) | Empty |
-| `AI_PROVIDER` | LLM provider: `gemini` or `openai` | `gemini` |
-| `GEMINI_API_KEY` | Google Gemini API key (free at [aistudio.google.com](https://aistudio.google.com/)) | Empty |
-| `OPENAI_API_KEY` | Optional OpenAI API key alternative | Empty |
-| `DATABASE_URL` | Prisma database connection string | `"file:./dev.db"` |
-
-### 3. Initialize Database
-Initialize the Prisma SQLite database (no external services needed):
-```bash
-npx prisma generate
+# Initialize local SQLite database
 npx prisma db push
-```
+npx prisma generate
 
-### 4. Start Development Server
-```bash
+# Start development server
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+Visit [http://localhost:3000](http://localhost:3000) to use IssuePilot.
 
 ---
 
-## Running Tests
+## Running the Automated Test Suite
 
-IssuePilot includes comprehensive unit, integration, and E2E pipeline tests with Vitest:
+IssuePilot includes unit, integration, and end-to-end tests covering cryptography, database relations, API route handlers, and multi-tenant authorization:
 
 ```bash
-# Run all tests once
+# Run all tests
 npm test
 
 # Run tests in watch mode
 npm run test:watch
 ```
 
-### Type Checking
-```bash
-npx tsc --noEmit
-```
-
-### Production Build
-```bash
-npm run build
-npm run start
-```
-
 ---
 
-## Production Deployment with Docker
+## Technology Stack
 
-To deploy with PostgreSQL and Redis:
-
-```bash
-# Start PostgreSQL and Redis containers
-docker compose up -d
-
-# Set DATABASE_URL in .env
-DATABASE_URL="postgresql://issuepilot:issuepilot_secret@localhost:5432/issuepilot_db?schema=public"
-
-# Deploy database migrations
-npx prisma db push
-
-# Build and start
-npm run build
-npm start
-```
-
----
-
-## License
-MIT
+- **Framework**: Next.js 15 (App Router), React 19, TypeScript
+- **Styling**: Tailwind CSS (inspired by rubens.design dark indigo theme, Inter typography)
+- **Database & ORM**: SQLite (`dev.db`) with Prisma ORM
+- **Authentication**: Native Node.js `crypto` (`scrypt`, `timingSafeEqual`), httpOnly cookies, GitHub OAuth
+- **Testing**: Vitest 3.0
